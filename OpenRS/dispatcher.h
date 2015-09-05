@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <queue>
 
 // YES
 // That reading glext.h DID have a use!
@@ -63,7 +64,9 @@ enum SpecialDescriptor {
     SD_REJECT,
     SD_NONE, // I don't got no type!
     SD_DISPLAY_REDRAW,
-    SD_DISPLAY_MARKFORREDRAW
+    SD_DISPLAY_MARKFORREDRAW,
+    SD_UPDATE_DISTRICT,
+    SD_ITEM_MOVED
 };
 
 // If I use a state machine to track menus and such, the StateDescriptor
@@ -96,9 +99,10 @@ class Dispatcher
 private:
     std::list<struct _dispatch_record *> dispatch_list;
     std::string cin_input;
-    CommandDescriptor last_command;
-    bool is_last_command_executed;
+    std::queue<CommandDescriptor *> cmd_list;
+    //bool is_last_command_executed;
     std::vector<std::string *> callback_argv;
+    bool is_executing;
 
     bool matchesGivenCommand(CommandDescriptor * descriptor);
     int getUniqueId();

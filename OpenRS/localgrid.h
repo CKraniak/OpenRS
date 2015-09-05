@@ -3,6 +3,8 @@
 
 #include <string>
 
+class LocalGrid;
+
 #include "item.h"
 #include "terrain.h"
 #include "district.h"

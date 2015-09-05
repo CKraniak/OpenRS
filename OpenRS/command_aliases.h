@@ -22,6 +22,8 @@ extern struct CommandDescriptor CDESC_NONE;
 extern struct CommandDescriptor CDESC_KEYS_NUMPAD;
 extern struct CommandDescriptor CDESC_DISPLAY_REDRAW;
 extern struct CommandDescriptor CDESC_DISPLAY_MARKFORREDRAW;
+extern struct CommandDescriptor CDESC_UPDATE_DISTRICT;
+extern struct CommandDescriptor CDESC_ITEM_MOVED;
 
 #endif // ORS_ASCII_CONSOLE
 

@@ -15,4 +15,8 @@ struct CommandDescriptor CDESC_DISPLAY_REDRAW =
                 {0, GR_NONE, SD_DISPLAY_REDRAW, ST_NONE};
 struct CommandDescriptor CDESC_DISPLAY_MARKFORREDRAW =
                 {0, GR_NONE, SD_DISPLAY_MARKFORREDRAW, ST_NONE};
+struct CommandDescriptor CDESC_UPDATE_DISTRICT =
+                {0, GR_NONE, SD_UPDATE_DISTRICT, ST_NONE};
+struct CommandDescriptor CDESC_ITEM_MOVED =
+                {0, GR_NONE, SD_ITEM_MOVED, ST_NONE};
 #endif // ORS_ASCII_CONSOLE

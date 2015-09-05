@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     actor.cpp
 
 OTHER_FILES += \
-    plan.txt
+    plan.txt \
+    ../README.txt
 
 HEADERS += \
     world.h \

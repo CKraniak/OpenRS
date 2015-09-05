@@ -4,9 +4,6 @@
 #include <iostream>
 
 #include "district.h"
-#include "terrain.h"
-#include "item.h"
-#include "playercharacter.h"
 
 District::District(GameOptionSet *options, Dispatcher * dispatcher) {
     _options = options;
@@ -14,6 +11,9 @@ District::District(GameOptionSet *options, Dispatcher * dispatcher) {
     height = 15;
     is_generated = false;
     mainloop_dispatcher = dispatcher;
+    mainloop_dispatcher->registerCommand(CALLBACK_FIX(this->onMoveItem),
+                                         &CDESC_ITEM_MOVED,
+                                         this);
 }
 
 int District::generate() {
@@ -147,5 +147,6 @@ bool District::moveItemRelativeByNumpad(Item *item, char direction) {
         return false; // can't move onto blocking terrain;
     }
     item->setPosition(new_x, new_y);
+    mainloop_dispatcher->pushCommand(&CDESC_ITEM_MOVED);
     return true;
 }

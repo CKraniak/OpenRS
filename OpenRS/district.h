@@ -3,9 +3,12 @@
 
 #include <vector>
 
+class District;
+
 #include "gameoptionset.h"
 #include "terrain.h"
 #include "item.h"
+#include "playercharacter.h"
 #include "dispatcher.h"
 
 class District
@@ -23,8 +26,11 @@ private:
                            std::vector<std::string *> argv) {
         (((District *)_this)->mainloop_dispatcher)
                             ->pushCommand(&CDESC_DISPLAY_MARKFORREDRAW);
-        (((District *)_this)->mainloop_dispatcher)
-                            ->execute();
+//        (((District *)_this)->mainloop_dispatcher)
+//                            ->execute();
+#ifdef PRINTLINE
+        std::cout << "district onMoveItem" << std::endl;
+#endif
     }
 
 public:

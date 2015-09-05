@@ -25,11 +25,17 @@ private:
             ((Camera *)_this)->update();
             ((Camera *)_this)->to_redraw = false;
         }
+#ifdef PRINTLINE
+        std::cout << "camera onRedraw" << std::endl;
+#endif
     }
 
     static void onMarkForRedrawEvent(void * _this,
                                      int argc,
                                      std::vector<std::string *> argv) {
+#ifdef PRINTLINE
+        std::cout << "camera onMarkForRedraw" << std::endl;
+#endif
         ((Camera *)_this)->to_redraw = true;
     }
 

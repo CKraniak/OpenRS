@@ -30,8 +30,8 @@ bool Dispatcher::matchesGivenCommand(CommandDescriptor *descriptor) {
     // Then check the group
     // Then check the COMMANDTYPE
 //    std::cout << "match function" << std::endl;
-    // Only an ANY_OVERRIDE will run on a NONE command.
-    if (last_command.special_type == CDESC_REJECT.special_type) {
+    // Only an ANY_OVERRIDE will run on a REJECT command.
+    if (cmd_list.front()->special_type == CDESC_REJECT.special_type) {
         if (descriptor->special_type == CDESC_ANY_OVERRIDE.special_type) {
 //            std::cout << "any_override" << std::endl;
             return true;
@@ -40,7 +40,7 @@ bool Dispatcher::matchesGivenCommand(CommandDescriptor *descriptor) {
         return false;
     }
 
-    // The only case whem ANY doesn't run is for a NONE command.
+    // The only case whem ANY doesn't run is for a REJECT command.
     // Since that case is covered / returned above, go ahead and
     // run any ANY descriptors.
     if (descriptor->special_type == CDESC_ANY.special_type) {
@@ -49,22 +49,43 @@ bool Dispatcher::matchesGivenCommand(CommandDescriptor *descriptor) {
     }
 
     // Start by direct matches of special types.
-    if (last_command.special_type == descriptor->special_type) {
+    if (cmd_list.front()->special_type == descriptor->special_type) {
 //        std::cout << "special eq" << std::endl;
+        if (cmd_list.front()->special_type == CDESC_NONE.special_type) {
+//            std::cout << "special eq: NONE" << std::endl;
+            goto leave_specialtype_if;
+        }
         return true;
     }
+leave_specialtype_if:
 
     // Look at group types next.
     // If the state is not equivalent, they should not be run, but that behavior
     // won't be implemented until later.
-    if (last_command.group == descriptor->group) {
+    if (cmd_list.front()->group == descriptor->group) {
 //        std::cout << "group" << std::endl;
+        if (cmd_list.front()->group == CDESC_NONE.group) {
+//            std::cout << "group: NONE" << std::endl;
+            goto leave_group_if;
+        }
         return true;
     }
+leave_group_if:
+
+    if (cmd_list.front()->command == descriptor->command) {
+        //std::cout << "command" << std::endl;
+        if (cmd_list.front()->command == CDESC_NONE.command) {
+//            std::cout << "command: NONE" << std::endl;
+            goto leave_command_if;
+        }
+        return true;
+    }
+leave_command_if:
     // Automatically reject.
 //    std::cout << (int) (descriptor->special_type) << std::endl;
 //    std::cout << (int) (descriptor->group) << std::endl;
 //    std::cout << (char) (descriptor->command) << std::endl;
+//    std::cout << "reject" << std::endl;
     return false;
 }
 
@@ -120,6 +141,7 @@ void Dispatcher::clearCallbackArgv() {
 }
 
 Dispatcher::Dispatcher() {
+    is_executing = false;
 }
 
 // Registers the command with the dispatcher.
@@ -149,19 +171,32 @@ int Dispatcher::registerCommand(CALLBACK_PTR func,
 // message receiving / parsing that is OS-dependent.
 void Dispatcher::execute() {
     // Determine current command.
-    std::vector<std::string *> argv = callback_argv;
-    for (  std::list<_dispatch_record *>::iterator it = dispatch_list.begin();
-           it != dispatch_list.end();
-           it++) {
-        // Execute all callbacks with matching commands.
-//        std::cout << "execute" << std::endl;
-        if (this->matchesGivenCommand( &((*it)->command_desc)) ) {
-//            std::cout << "matched" << std::endl;
-            this->callFunction(**it, argv);
-//            std::cout << "was_run" << std::endl;
-        }
+#ifdef PRINTLINE
+    std::cout << "exec_call" << std::endl;
+#endif
+    if (is_executing) {
+        return;
     }
-    this->clearCallbackArgv();
+    is_executing = true;
+    while (cmd_list.size() > 0) {
+        std::vector<std::string *> argv = callback_argv;
+        for (  std::list<_dispatch_record *>::iterator it = dispatch_list.begin();
+               it != dispatch_list.end();
+               it++) {
+            // Execute all callbacks with matching commands.
+//            std::cout << "execute" << std::endl;
+            if (this->matchesGivenCommand( &((*it)->command_desc)) ) {
+//                std::cout << "matched" << std::endl;
+                this->callFunction(**it, argv);
+    //            std::cout << "was_run" << std::endl;
+            }
+        }
+        this->clearCallbackArgv();
+        CommandDescriptor * d = cmd_list.front();
+        cmd_list.pop();
+        delete d;
+    }
+    is_executing = false;
 }
 
 // Right now, only get the first letter of a string.
@@ -191,11 +226,15 @@ void Dispatcher::parseCinInput(std::string * input) {
     }
     this->pushCommand(cdesc);
     this->execute();
+    this->pushCommand(&CDESC_DISPLAY_REDRAW);
+    this->execute();
     delete cdesc;
 }
 
 // Must make a copy of all important things. Caller not guaranteed to
 // leave pointer alone.
 void Dispatcher::pushCommand(CommandDescriptor * command) {
-    last_command.copy(*command);
+    CommandDescriptor * cmd = new CommandDescriptor();
+    cmd->copy(*command);
+    cmd_list.push(cmd);
 }

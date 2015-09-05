@@ -3,15 +3,21 @@
 
 #include <iostream>
 
-#include "localgrid.h"
-#include "dispatcher.h"
-#include "district.h"
+class Item;
 
 enum ItemType {
     IT_CREATURE,
     IT_PLAYER_CHARACTER,
     IT_FURNITURE
 };
+
+// localgrid.h introduces a nasty circular dependency.
+// Leave it out if at all possible.
+//#include "localgrid.h"
+#include "dispatcher.h"
+//#include "district.h"
+
+class District;
 
 class Item
 {
