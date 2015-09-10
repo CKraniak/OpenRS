@@ -127,6 +127,7 @@ public:
     void parseCinInput(std::string * input);
     void pushCommand(CommandDescriptor * command);
     void execute();
+    CommandDescriptor & getMatchingDescriptor(CommandDescriptor & desc);
 };
 
 #endif // DISPATCHER_H

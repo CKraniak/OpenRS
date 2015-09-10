@@ -1,10 +1,12 @@
 #include <iostream>
-#include <GL/glew.h>
+//#include <GL/glew.h>
 
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 
-#include <glm/fwd.hpp>
-#include <glm/glm.hpp>
+//#include <glm/fwd.hpp>
+//#include <glm/glm.hpp>
+
+//#include "boost/signals2.hpp"
 
 #define DEBUG 1
 //#define PRINTLINE 1
@@ -51,14 +53,21 @@ int main(int argc, char** argv)
     // I CAN'T BELIEVE THIS MACRO WORKED FIRST TIME
 //    REGISTER_CALLBACK(Camera, update, &CDESC_ANY, disp, camera)
     std::string input;
+    bool is_one = false;
+    int i = 0;
     while (1) {
 //        if (needs_update) {
 //            camera->update();
 //            needs_update = false;
 //        }
         std::cin >> input;
+//        if (is_one)
+//            input = "1", is_one = false;
+//        else
+//            input = "9", is_one = true;
         disp.parseCinInput(&input);
-//        disp.pushCommand(&CDESC_DISPLAY_REDRAW);
+//        std::cout << ++i << std::endl;
+        //disp.pushCommand(&CDESC_DISPLAY_REDRAW);
         //disp.execute(); // <-- This is so damn evil.
                         //     If it works, I'll be floored.
                         // UPDATE: HOLY FUCK, I'M FLOORED

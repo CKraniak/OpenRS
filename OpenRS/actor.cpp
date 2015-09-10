@@ -5,6 +5,10 @@
 
 #include "actor.h"
 
-Actor::Actor()
-{
+Actor::Actor(int x, int y,
+             ActorType type,
+             Dispatcher * disp,
+             District * parent) :
+    Item(x, y, IT_ACTOR, disp, parent) {
+
 }

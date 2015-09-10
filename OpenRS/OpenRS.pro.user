@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.1, 2015-09-05T00:25:42. -->
+<!-- Written by Qt Creator 2.4.1, 2015-09-09T21:19:12. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -10,7 +10,7 @@
   <variable>ProjectExplorer.Project.EditorSettings</variable>
   <valuemap type="QVariantMap">
    <value type="bool" key="EditorConfiguration.AutoIndent">true</value>
-   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">false</value>
+   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">true</value>
    <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.0">
     <value type="QString" key="language">Cpp</value>
     <valuemap type="QVariantMap" key="value">
@@ -34,7 +34,7 @@
    <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
    <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
    <value type="int" key="EditorConfiguration.TabSize">8</value>
-   <value type="bool" key="EditorConfiguration.UseGlobal">true</value>
+   <value type="bool" key="EditorConfiguration.UseGlobal">false</value>
    <value type="int" key="EditorConfiguration.Utf8BomBehavior">1</value>
    <value type="bool" key="EditorConfiguration.addFinalNewLine">true</value>
    <value type="bool" key="EditorConfiguration.cleanIndentation">true</value>

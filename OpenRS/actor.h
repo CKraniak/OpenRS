@@ -1,18 +1,38 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-//#include <windows.h>
-//#include
+enum ActorType {
+    AT_PLAYER_CHARACTER,
+    AT_NPC,
+    AT_ENEMY,
+    AT_NONE
+};
 
-class Actor
+//#include <windows.h>
+#include "item.h"
+
+class Actor : public Item
 {
 private:
-    // Will make part of a superclass, "MappableObject" or "DisplayableObject"
-    wchar_t display_symbol;
+    //char display_symbol;
     // Will eventually need a way to track actions.
+    // Probably a behavior dispatcher, or maybe an AI object.
+    static void onDistrictUpdate(void * _this,
+                                 int argc,
+                                 std::vector<std::string *> argv) {
+        ((Actor *)_this)->update();
+    }
+
+protected:
+    // Call to ask Actor to move / act in the district.
+    // Virtual SHOULD make it bind to the child's reimplementation.
+    virtual void update() = 0;
 
 public:
-    Actor();
+    Actor(int x, int y,
+          ActorType type,
+          Dispatcher * dispatcher,
+          District * parent);
 };
 
 #endif // ACTOR_H

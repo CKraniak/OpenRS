@@ -5,9 +5,9 @@ TODO:
     - HOLY GOD FUCK POINTERS
  X Capture keyboard events
     - std::cin stopgap, will need future upgrade
- - need a way to issue commands
- - Implement PC motion
- - Implement collision detection
+ X need a way to issue commands
+ X Implement PC motion
+ X Implement collision detection
  - Fix camera to player
  - Implement NPC movement
  - Implement NPC pathing (something super basic)

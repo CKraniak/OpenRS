@@ -2,6 +2,8 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= qt
 
+INCLUDEPATH += "D:/Programming/boost/boost_1_59_0"
+
 SOURCES += main.cpp \
     world.cpp \
     terrain.cpp \
@@ -16,11 +18,13 @@ SOURCES += main.cpp \
     dispatcher.cpp \
     command_aliases.cpp \
     camera.cpp \
-    actor.cpp
+    actor.cpp \
+    behavior_alisases.cpp
 
 OTHER_FILES += \
     plan.txt \
-    ../README.txt
+    ../README.txt \
+    makefile
 
 HEADERS += \
     world.h \
@@ -37,5 +41,6 @@ HEADERS += \
     defines.h \
     command_aliases.h \
     camera.h \
-    actor.h
+    actor.h \
+    behavior_alisases.h
 

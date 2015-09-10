@@ -41,7 +41,7 @@ int District::generate() {
     // Add player character item
     item_array.push_back(new PlayerCharacter(8,
                                              8,
-                                             IT_PLAYER_CHARACTER,
+                                             AT_PLAYER_CHARACTER,
                                              mainloop_dispatcher,
                                              this));
 
@@ -140,7 +140,7 @@ bool District::moveItemRelativeByNumpad(Item *item, char direction) {
         break;
     }
     if (new_x < 0 || new_x > (width - 1) || new_y < 0 || new_y > (height - 1)) {
-        return false;
+        return false; // can't move out of bounds of the district
     }
     Terrain * t = this->getTerrainAt(new_x, new_y);
     if (t->isBlocking()) {

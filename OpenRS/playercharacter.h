@@ -3,14 +3,14 @@
 
 class PlayerCharacter;
 
-#include "item.h"
+#include "actor.h"
 #include "district.h"
 #include "dispatcher.h"
 
 //#ifndef DISTRICT_H
 //#endif // ! DISTRICT_H
 
-class PlayerCharacter : public Item
+class PlayerCharacter : public Actor
 {
 private:
     void onNumpad(char c);
@@ -28,9 +28,13 @@ private:
         std::cout << "player onMoveItem" << std::endl;
 #endif
     }
+    static void onBump(void * _this, int argc, std::vector<std::string> argv);
+
+protected:
+    virtual void update();
 
 public:
-    PlayerCharacter(int, int, ItemType, Dispatcher *, District * parent);
+    PlayerCharacter(int, int, ActorType, Dispatcher *, District * parent);
 };
 
 #endif // PLAYERCHARACTER_H

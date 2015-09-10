@@ -6,7 +6,7 @@
 
 char getDisplayChar(ItemType itype) {
     switch (itype) {
-    case IT_CREATURE:
+    case IT_ACTOR:
         return 'X';
     case IT_PLAYER_CHARACTER:
         return 'P';
