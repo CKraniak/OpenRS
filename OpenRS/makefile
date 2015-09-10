@@ -7,11 +7,12 @@ CFLAGS = -Wall $(DEBUG)
 CPPFLAGS = -I../../../boost/boost_1_59_0
 LFLAGS = -Wall
 LDLIBS =
+EXECUTABLE = openrs.exe
 
-all: openrs
+all: $(EXECUTABLE)
 
-openrs: main
-	mv main.exe openrs.exe
+$(EXECUTABLE): main
+	mv main.exe $(EXECUTABLE)
 
 main: $(OBJS)
 
