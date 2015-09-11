@@ -10,7 +10,7 @@
   <variable>ProjectExplorer.Project.EditorSettings</variable>
   <valuemap type="QVariantMap">
    <value type="bool" key="EditorConfiguration.AutoIndent">true</value>
-   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">true</value>
+   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">false</value>
    <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.0">
     <value type="QString" key="language">Cpp</value>
     <valuemap type="QVariantMap" key="value">
@@ -34,7 +34,7 @@
    <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
    <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
    <value type="int" key="EditorConfiguration.TabSize">8</value>
-   <value type="bool" key="EditorConfiguration.UseGlobal">false</value>
+   <value type="bool" key="EditorConfiguration.UseGlobal">true</value>
    <value type="int" key="EditorConfiguration.Utf8BomBehavior">1</value>
    <value type="bool" key="EditorConfiguration.addFinalNewLine">true</value>
    <value type="bool" key="EditorConfiguration.cleanIndentation">true</value>
@@ -101,7 +101,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory">D:/Programming/QT/roguelikelearn/OpenRS-build-desktop-Qt_4_8_0_for_Desktop_-_MinGW__Qt_SDK__Debug</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory">D:/Programming/QT/roguelikelearn/OpenRS_0-2-build-desktop-Qt_4_8_0_for_Desktop_-_MinGW__Qt_SDK__Debug</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId">2</value>
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
@@ -151,7 +151,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">0</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory">D:/Programming/QT/roguelikelearn/OpenRS-build-desktop-Qt_4_8_0_for_Desktop_-_MinGW__Qt_SDK__Release</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory">D:/Programming/QT/roguelikelearn/OpenRS_0-2-build-desktop-Qt_4_8_0_for_Desktop_-_MinGW__Qt_SDK__Release</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId">2</value>
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
@@ -232,14 +232,14 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">OpenRS</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">OpenRS_0-2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration</value>
     <value type="int" key="Qt4ProjectManager.Qt4RunConfiguration.BaseEnvironmentBase">2</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">OpenRS.pro</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">OpenRS_0-2.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
-    <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">true</value>
+    <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">false</value>
     <valuelist type="QVariantList" key="Qt4ProjectManager.Qt4RunConfiguration.UserEnvironmentChanges"/>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>

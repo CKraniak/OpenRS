@@ -1,0 +1,29 @@
+Need to focus on making it fun first and foremost.
+
+TODO:
+ - Implement Observer, as it's a backbone piece
+ - Get a basic ASCII console display version going
+ - Capture keyboard events
+    - std::cin stopgap is currently acceptable
+    - glfw3 looks good too
+ - Implement PC motion
+ - Implement collision detection
+ - Fix camera to player
+ - Implement NPC movement
+ - Implement NPC pathing (something super basic)
+ - Implement HP
+ - Implement melee combat
+ - Implement medkit
+ - Implement inventory with
+    - pickup
+    - drop
+    - list items in pack
+    - list items on ground
+ - Implement hunger
+ - Create food items
+ - Make better starter map (manually for now)
+ - Implement weapons with damage modifiers (bats, crowbars, and such)
+ - RELEASE AS ALPHA 0.1, Creative Commons license
+ - A2: OpenGL system
+ - A3: Decent map generator
+ - A4:
