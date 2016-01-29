@@ -1,7 +1,8 @@
 Copyright (C) 2015, Chesley Kraniak
 
-License is undetermined. You're free to contribute, although it'd be nice if I
-had contact with any collaborators.
+As of 1-29-2016, license is GPL ... we'll go with version 3 for now. The
+decision is mostly arbitrary, and I will be considering more open licenses
+like MIT in the future.
 
 OPEN ROGUE SURVIVOR
 
