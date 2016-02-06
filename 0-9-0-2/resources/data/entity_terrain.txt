@@ -1,0 +1,3 @@
+entity=terrain
+blocking=false
+imagesrc=

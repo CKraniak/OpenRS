@@ -1,0 +1,103 @@
+#ifndef CESYSTEM_H
+#define CESYSTEM_H
+
+#include <vector>
+#include <string>
+#include <map>
+
+#include "entity.h"
+#include "component.h"
+
+class EntitySignature {
+public:
+    std::vector<Component> components_in_signature;
+    bool entityMatchesSignature(Entity & e);
+};
+
+// :TODO: move most of these specific system definitions into better places.
+
+class CESystem
+{
+    // List of entity objects cached for quick operation
+    // Avoids having to iterate over a giant list from somewhere, but would
+    // need to be kept current ... maybe with some events?
+    std::vector<Entity> entity_cache_;
+    // Components an entity needs for the entitiy to be handled by this system
+    // A system should be able to define multiple things it handles, e.g.
+    // the input system can handle an "on_numkey" component OR an "on_esc"
+    // component. Thus, we can use multiple signatures.
+    std::vector<EntitySignature> signatures_handled_;
+
+    // Maybe have an applyToEntities that runs a lambda or somesuch over all of
+    // the entities?
+
+protected:
+    void pushNeededSignature(EntitySignature & sig) {
+        signatures_handled_.push_back(sig);
+    }
+
+public:
+    CESystem();
+    bool entityHasNeededComponents(Entity & e);
+    virtual int run(std::vector<Entity> & entity_list) {}
+};
+
+class ScriptedCESystem : public CESystem {
+    using scriptable_function = int (*)(std::vector<std::string>);
+    std::map<std::string, scriptable_function> script_function_map;
+
+public:
+    virtual int callScriptableFunction(std::string  function_name,
+                                       std::vector<std::string> argv) {}
+};
+
+// The first system should be an AsciiDisplaySystem. It will take entities with
+// components "locationx", "locationy", and "asciidisplaychar". Right now, I
+// will not be handling the case of multiple things in the same location.
+class AsciiDisplayCESystem : public CESystem {
+    std::vector<char> grid_;
+    int width;
+    int height;
+
+    // updateGrid will iterate over the entities and push their chars to the
+    // locations specified. Any
+    void updateGrid(std::vector<Entity> & adces_entities);
+
+public:
+    AsciiDisplayCESystem();
+    std::vector<char> getRenderData();
+};
+
+// Input should operate on things that define some kind of on_<input> behavior
+// e.g. "on_numpad" for a component name.
+// Full list of supported components:
+//   - on_numpad
+//   - on_esc
+// Behaviors called are shown in the value of the on_<input> component.
+//
+// on_esc should hook into the input handler for now, to get the main loop to
+// break out.
+//
+// on_numpad will probably only be run by the player entity for now. It's
+// behavior will probably be something to point to a routine internal to the
+// MovementSystem. Perhaps:
+//     "on_numpad=run_system(MOVEMENT, <func_name>, entity_id)"
+// I'll need something that can resolve this to the right thing. Maybe a script
+// system that, in a barebones state, only supports the "run_system" call.
+struct KeyInData;
+
+class InputCESystem : public CESystem {
+
+public:
+    // Push needed components
+    int onInput(KeyInData in);
+};
+
+class PlayerMovementCESystem : public ScriptedCESystem {
+
+public:
+    int onNumpad(char num_key_val); // Apply a transform to the player object
+
+};
+
+#endif // CESYSTEM_H

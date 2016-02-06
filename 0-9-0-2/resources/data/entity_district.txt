@@ -1,0 +1,6 @@
+entity=district
+LIST:terrain
+LIST:entity
+environment=
+width=15
+height=15
