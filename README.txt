@@ -1,6 +1,7 @@
 Copyright (C) 2015-2016, Chesley Kraniak
 
-License is GPLv3. I may decide to update this with something less restrictive later, but not yet.
+License is GPLv3. I may decide to update this with something less
+restrictive later, but not yet.
 
 OPEN ROGUE SURVIVOR
 
