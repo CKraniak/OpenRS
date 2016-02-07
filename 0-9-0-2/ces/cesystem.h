@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <algorithm>
 
 #include "entity.h"
 #include "component.h"
@@ -56,16 +57,22 @@ public:
 // will not be handling the case of multiple things in the same location.
 class AsciiDisplayCESystem : public CESystem {
     std::vector<char> grid_;
-    int width;
-    int height;
+    int width_;
+    int height_;
 
     // updateGrid will iterate over the entities and push their chars to the
     // locations specified. Any
     void updateGrid(std::vector<Entity> & adces_entities);
 
 public:
-    AsciiDisplayCESystem();
+    AsciiDisplayCESystem(int width, int height) :
+            width_(width),
+            height_(height),
+            grid_(width * height, '.') {
+        grid_[width * height / 2] = 'P';
+    }
     std::vector<char> getRenderData();
+    bool setGridChar(char c, int x, int y);
 };
 
 // Input should operate on things that define some kind of on_<input> behavior
@@ -94,9 +101,12 @@ public:
 };
 
 class PlayerMovementCESystem : public ScriptedCESystem {
-
+    int pos_x;
+    int pos_y;
 public:
-    int onNumpad(char num_key_val); // Apply a transform to the player object
+    PlayerMovementCESystem(int x, int y) : pos_x(x), pos_y(y) {}
+    int onNumpad(char , AsciiDisplayCESystem &); // Apply a transform to the
+                                               // player object
 
 };
 
