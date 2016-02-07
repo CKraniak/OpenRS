@@ -16,9 +16,10 @@ class MLInterface {
     bool quit_;
     HWND h_wnd_;
     ENUMLOGFONTEXDV * ptr_elf;
+    std::string display_text;
 
 public:
-    MLInterface() : quit_(false) {}
+    MLInterface() : quit_(false), display_text("INIT") {}
     void update();
     void render();
     static LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -26,6 +27,7 @@ public:
     bool shouldQuit() { return quit_; }
     void emptyMessagePump();
     bool createMainWindow(HINSTANCE, int);
+    void asciiDraw(HDC);
 };
 
 void MLInterface::emptyMessagePump() {
@@ -82,7 +84,7 @@ bool MLInterface::createMainWindow(HINSTANCE h_inst,
     return true;
 }
 
-void draw(HDC dc) {
+void MLInterface::asciiDraw(HDC dc) {
     if(dc == NULL) {
         ERR_MSGOUT("Unable to get device context");
         return;
@@ -112,7 +114,8 @@ void draw(HDC dc) {
     if (old_font == NULL) {
         ERR_MSGOUT("Failed to select font");
     }
-    std::string s = "TESTING FONT, Courier New 012345 ilI1\niiiiiiiiiiiiii";
+//    std::string s = "TESTING FONT, Courier New 012345 ilI1\niiiiiiiiiiiiii";
+    std::string s = this->display_text;
     DrawText(dc, s.c_str(), s.size(), &r, DT_NOCLIP);
     SelectObject(dc, old_font);
 }
@@ -130,32 +133,55 @@ LRESULT CALLBACK MLInterface::MainWndProc(HWND h_wnd,
     case WM_KEYDOWN:
         switch (w_param) {
         case VK_NUMPAD1:
+            this_->display_text = "1";
+            break;
         case VK_NUMPAD2:
+            this_->display_text = "2";
+            break;
         case VK_NUMPAD3:
+            this_->display_text = "3";
+            break;
         case VK_NUMPAD4:
+            this_->display_text = "4";
+            break;
         case VK_NUMPAD5:
+            this_->display_text = "5";
+            break;
         case VK_NUMPAD6:
+            this_->display_text = "6";
+            break;
         case VK_NUMPAD7:
+            this_->display_text = "7";
+            break;
         case VK_NUMPAD8:
+            this_->display_text = "8";
+            break;
         case VK_NUMPAD9:
+            this_->display_text = "9";
             break;
 
         default:
             break;
         }
+        InvalidateRect(h_wnd, NULL, TRUE);
         break;
 
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC dc = BeginPaint(h_wnd, &ps);
-        draw(dc);
+        this_->asciiDraw(dc);
         EndPaint(h_wnd, &ps);
         return 0;
     }
 
     case WM_PRINTCLIENT: {
-        draw(reinterpret_cast<HDC>(w_param));
+        this_->asciiDraw(reinterpret_cast<HDC>(w_param));
     }
+
+//    case WM_ERASEBKGND: {
+//        this_->asciiDraw(reinterpret_cast<HDC>(w_param));
+//    }
+
 
     case WM_CHAR:
         if(w_param == VK_ESCAPE) {
