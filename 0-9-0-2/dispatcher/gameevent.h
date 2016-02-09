@@ -1,3 +1,23 @@
+/* Copyright (C) 2016, Chesley Kraniak
+ *
+ * This code is distributed under the terms of the GPLv3 license, which should
+ * have been included with this file in the root directory as "LICENSE.txt". If
+ * you do not have a copy of the license, see:
+ *     http://www.gnu.org/licenses/gpl-3.0.txt
+ * or:
+ *     https://github.com/CKraniak/OpenRS
+ * for the license.
+ *
+ * gameevent.h: Defines the GameEvent<T> class.
+ *
+ * A game event is an object that serves to pattern-match to some group of
+ * handlers. Essentially, when an event is emmited from a Dispatcher, the
+ * dispatcher will use the data type and the event types listed in the given
+ * GameEvent to call the matching GameEventHandlers. The only thing needed
+ * here is to have said data type, event types, and (optionally) data to send
+ * to the handlers.
+ */
+
 #ifndef GAMEEVENT_H
 #define GAMEEVENT_H
 
@@ -5,6 +25,13 @@
 #include <vector>
 #include <typeinfo>
 
+// The EventBase class facilitates the de-templating of the Dispatcher class.
+// It should not be used directly in user code.
+//
+// This class is where the operator== for the GameEvent is defined. Dispatcher
+// uses this to reject registration of the "same" event in cases where rejection
+// is not explicitly overridden. Currently, the GameEvent's "name" field is
+// used to determine if events are the "same" or not.
 class EventBase {
 protected:
     std::string name_;
@@ -18,9 +45,24 @@ public:
     bool operator==(EventBase & that) {
         return (this->name_.compare(that.getName()) == 0);
     }
+    virtual ~EventBase() {}
 
 };
 
+// The GameEvent class describes an "event" and its attributes, including:
+//   - the "event types"
+//   - the data to send (optional) and its data type (not optional)
+//   - an event "name", which is used to see if events are "the same"
+//
+// If the user wants all of the events to be able to call all of the handlers,
+// the user will need to assure that they all use the same type in their
+// templates. This is arguably a good idea, unless the user is interested in
+// sending multiple kinds of data. Things which need to respond to multiple
+// kinds of data should define a struct to contain all of the possible data
+// types that might be passed; the events and handlers can then use this struct
+// to pass any kind of data defined in the struct. One could also use such a
+// struct to facilitate inter-handler communication, but that may make a
+// program's flow ridiculously difficult to follow, if not impossible.
 template <class T> class GameEvent : public EventBase
 {
     T data_;
@@ -48,8 +90,6 @@ public:
     T    getData() { return data_; }
     void clearData() { data_ = T(); has_data = false; }
 
-    //typedef typeof(T) data_type;
-    using data_type = T;
     bool hasData() { return has_data; }
 };
 

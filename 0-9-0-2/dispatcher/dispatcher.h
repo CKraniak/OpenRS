@@ -1,47 +1,100 @@
+/* Copyright (C) 2016, Chesley Kraniak
+ *
+ * This code is distributed under the terms of the GPLv3 license, which should
+ * have been included with this file in the root directory as "LICENSE.txt". If
+ * you do not have a copy of the license, see:
+ *     http://www.gnu.org/licenses/gpl-3.0.txt
+ * or:
+ *     https://github.com/CKraniak/OpenRS
+ * for the license.
+ *
+ * dispatcher.h: Defines the Dispatcher class.
+ *
+ * The Dispatcher is the core of the event system in OpenRS. A user will define
+ * one or many events and one or many event handlers, and these will be
+ * registered with the Dispatcher. When an event is fired (using emitEvent()),
+ * the emitted event will call all of the matching event handlers. Since the
+ * connections to the Dispatcher aren't strict, this means a MovementSystem
+ * doesn't have to know about an AudioSystem in order to tell it to play a
+ * 'footstep' sound; the MovementSystem essentially "yells" that a movement has
+ * happened, and the AudioSystem will listen for such yells itself and fire the
+ * correct sound if it hears the correct yell.
+ *
+ * One of the key components of the system is the ability to match an arbitrary
+ * event to an arbitrary handler. There are no privileged or special events; the
+ * heirarchy is defined by the user of the Dispatcher. An event has one or many
+ * "types" associated with it (e.g. a numpad 7 event may be a "keypress_type", a
+ * "numkeypress_type", and a "num7keypress_type" all at once), and the handlers
+ * have a matching code they define that can match types arbitrarily (e.g.
+ * "numkeypress_type AND NOT num5keypress_type"). This way, the events can have
+ * an arbitrary number of meanings, and the handlers can handle an arbitrary
+ * set of events, based on the events' declared types.
+ *
+ * The user defines both event types and handler match strings on their
+ * instantiation. An event's types is a vector of strings; a handler's match
+ * string is a single string with keywords AND, OR, NOT and key symbols '(' and
+ * ')'. An empty handler string matches nothing and is never run.
+ *
+ * The system works on Event *objects*, but EventHandler *classes*. This is so
+ * the handlers can abuse C++'s operator() capability. There are other ways of
+ * implementing this functionality, but I felt this was less intrusive than
+ * most; it's particularly easier than using function pointers. This means you
+ * cannot register the same handler twice. You probably shouldn't need to, since
+ * any time you need to execute the same code twice, you can just loop it, and
+ * if you need a runtime-defined number of loops, the type system is flexible
+ * enough for you to pass in an extra loop_count variable in as a field of a
+ * struct.
+ *
+ * I've made a special macro for defining event handler objects. You can study
+ * the macro to learn how to make your own handler objects (for, say, state
+ * management), or just use the macro as-is. However, since it's a preprocessor
+ * macro, care should be used in how you pass things to it; in particular,
+ * statements with side effects should not be passed in, except in the DEF
+ * argument that defines the handler's code (which is only pasted once). I don't
+ * have a better way of doing this right now, but I will look into making it
+ * better later on.
+ */
 #ifndef DISPATCHER_H
 #define DISPATCHER_H
 
 #include <string>
 #include <queue>
+
+#include "../utility.h"
 #include "gameevent.h"
 #include "gameeventhandler.h"
 
 #include "boost/signals2.hpp"
 
-#include "../utility.h"
-
 typedef int ehid_t; // Handler ID type
 typedef int eid_t;  // Event ID type
 
 // Interface to the signals. Serves to isolate the template to subclasses.
+// This is so I can put a std::map<int, SignalBase*> in the Dispatcher
+// without making Dispatcher itself a templated class.
 class SignalBase
 {
-
+    using conn_type = boost::signals2::connection;
 
 protected:
+    std::map<ehid_t, conn_type> conn_map;
     virtual void isDerived() = 0; // forcing a pure virtual base class
 
 public:
     SignalBase() {}
-//    template <class T> int  execSignal(T& data);
-//    template <class T> void connect(GameEventHandler<T>& hnd);
-    virtual void disconnect(HandlerBase* hnd) = 0;
-//    template <class T> int  operator()(T data);
+    virtual ~SignalBase() {}
+    void disconnect(ehid_t h_id);
 };
 
 template <class T> class EventSignal : public SignalBase {
     boost::signals2::signal<int (T)> sig;
     void isDerived() {} // concrete
-    std::map<ehid_t, boost::signals2::connection> conn_map;
 
 public:
     int  execSignal(T& data);
     void connect(GameEventHandler<T> hnd, ehid_t h_id);
-    void disconnect(HandlerBase* hnd);
     int  operator()(T& data);
 
-    //typedef typeof(T) force_type; // used to force a non-deduced context in
-                                  // emitEvent() later on.
     using force_type = T;
 };
 
@@ -55,17 +108,9 @@ int EventSignal<T>::execSignal(T &data)
 template <class T>
 void EventSignal<T>::connect(GameEventHandler<T> hnd, ehid_t h_id)
 {
-    sig.connect(hnd);
-}
-
-template <class T>
-void EventSignal<T>::disconnect(HandlerBase *hnd)
-{
-    GameEventHandler<T> * p = dynamic_cast<GameEventHandler<T>*>(hnd);
-    sig.disconnect(*p); // This relies on operator== to function.
-                          // operator== currently checks the typeids.
-                          // Handlers need different classes to be useful,
-                          // so this shouldn't be too big of a deal ... yet.
+    if(conn_map.find(h_id) == conn_map.end()) {
+        conn_map[h_id] = sig.connect(hnd);
+    }
 }
 
 template <class T>
@@ -90,7 +135,7 @@ class Dispatcher
     // Could also do an event queue
     // Would cast void* to type T, whatever that type is, to enable data passing
     // Well, the event already has data inside of it, so the void* isn't needed
-    std::queue<int> event_queue; // Event ID queue
+    //std::queue<int> event_queue; // Event ID queue
 
     ehid_t getFirstUnusedHandlerId();
     eid_t  getFirstUnusedEventId();
@@ -101,14 +146,14 @@ class Dispatcher
     bool isHandlerInList();
 
 public:
-    Dispatcher();
+    // Must delete any pointers in the maps
+    virtual ~Dispatcher();
 
     // Unlike events, the handlers must be directly registered. The operator()
     // can't be specified in a constructor without some twisted function
     // pointers. At least, I don't think they can be.
-                       template <class T, class A>
-                       ehid_t registerHandler(A& hnd);
-                       int    unregisterHandler(ehid_t hnd_id);
+    template <class T, class A> ehid_t registerHandler(A& hnd);
+                                int    unregisterHandler(ehid_t hnd_id);
 
                        // Register predefined event e
                        // If override is false, an event with a different
@@ -116,9 +161,6 @@ public:
                        // event list and signal map (this enables 2 of the
                        // "same" events to exist.
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
-
-                       eid_t registerEvent(std::vector<std::string> type_list,
-                                           std::string name = "");
                        int   unregisterEvent(eid_t e_id);
     template <class T> int emitEvent(GameEvent<T>& e, bool);
     template <class T> int emitEvent(eid_t e_id,
@@ -126,10 +168,11 @@ public:
     template <class T> int emitEvent(eid_t e_id);
     template <class T> void setData(int e_id, T data);
 
-    int         getEventIdFromName(std::string name);
-    std::string getEventTypenameFromId(int e_id);
-
     static void test();
+
+    // Might implement later if thought useful:
+    // int         getEventIdFromName(std::string name);
+    // std::string getEventTypenameFromId(int e_id);
 };
 
 template <class T>
@@ -146,6 +189,7 @@ template <class T, class A>
 ehid_t Dispatcher::registerHandler(A& hnd)
 {
     // Check to see if the handler is already listed
+    // Need to change this to use getHandlerId
     for(    auto it = handler_list.begin();
             it != handler_list.end();
             ++it) {
@@ -168,7 +212,8 @@ ehid_t Dispatcher::registerHandler(A& hnd)
             if(sig_map.find(it->first) == sig_map.end()) {
                 sig_map[it->first] = new EventSignal<T>();
             }
-            static_cast<EventSignal<T> *>(sig_map[it->first])->connect(hnd, new_id);
+            static_cast<EventSignal<T>*>(sig_map[it->first])->connect(hnd,
+                                                                      new_id);
         }
     }
     return new_id;
@@ -213,22 +258,26 @@ eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
 template <class T>
 int Dispatcher::emitEvent(GameEvent<T>& e,
                           bool register_if_not_present = true) {
+    // Check registration status.
     eid_t eid = getEventId(e);
     bool do_register = false;
     int retval;
-    if(eid == -1) {
-        if(! register_if_not_present) {
+    if(eid == -1) { // If event not registered
+        if(! register_if_not_present) { // return if the override isn't enabled
             return 0;
         }
         do_register = true;
-        eid = registerEvent(e);
+        eid = registerEvent(e); // otherwise, go ahead and register
     }
+    // Execute the event.
     if (e.hasData()) {
         retval = emitEvent<T>(eid, e.getData());
     }
     else {
         retval = emitEvent<T>(eid, T());
     }
+    // Unregister after executing, as the function should leave the Dispatcher
+    // in its previous state.
     if(do_register) {
         unregisterEvent(eid);
     }

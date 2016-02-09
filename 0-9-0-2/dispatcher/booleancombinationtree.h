@@ -1,29 +1,37 @@
-/* Copyright (C) 2015, Chesley Kraniak
+/* Copyright (C) 2015-2016, Chesley Kraniak
  *
- * License indeterminate. It'll be at least GPL, maybe MIT. Definitely open
- * source, though.
+ * This code is distributed under the terms of the GPLv3 license, which should
+ * have been included with this file in the root directory as "LICENSE.txt". If
+ * you do not have a copy of the license, see:
+ *     http://www.gnu.org/licenses/gpl-3.0.txt
+ * or:
+ *     https://github.com/CKraniak/OpenRS
+ * for the license.
  *
+ * booleancombinationtree.h: Defines the BooleanCombinationTree class.
+ *
+ * This class is internal to the Dispatcher system, and should not be directly
+ * used by a user.
  *
  * A boolean combination tree represents a boolean combination of presence
  * conditions. The tree is sent a list of strings to evaluate for presence
  * or non-presence and returns the result of the computation. For example,
  * if the given rule is:
- *
- * "condition_1 AND NOT condition_2"
- *
+ *     "condition_1 AND NOT condition_2"
  * and the tree is given the list of strings {"condition_5", "condition_1",
  * "condition_3"}, then it would evaluate to "true", since "condition_1" is
  * found while "condition_2" is not found.
  *
  * Empty conditions never match, and always evaluate to "false". Empty
  * conditions occur when the generator is given "" (the empty string, or an
- * equivalent) as the rule or when a syntatically incorrect rule is given
+ * equivalent) as the rule, and also when a syntatically incorrect rule is given
  * (e.g. "cond_1 AND AND NOT cond_2"). The isEmpty() function can be used to
  * tell if this has happened; in combination with checking that the generating
  * rule is not the empty string, it will tell you if there was a syntax error.
  *
- * The evaluation rules can be arbitrarily complicated. Realistically speaking,
- * you are limited by the amount of memory your target has.
+ * The evaluation rules (the "match string") can be arbitrarily complicated.
+ * Realistically speaking, you are limited by the amount of memory the computer
+ * running the compiled executable has.
  */
 
 #ifndef BOOLEANCOMBINATIONTREE_H
@@ -71,7 +79,6 @@ private:
     BooleanCombinationNode * getLeft()  const { return left_;  }
     BooleanCombinationNode * getRight() const { return right_; }
 };
-
 
 // Push the "present" vector to the boolean combiner
 // Boolean combiner does something like:
