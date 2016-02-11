@@ -14,6 +14,10 @@
 // As much as possible, try to avoid platform-specific things in GLCore
 // That is what GLFunctionFinder does for us.
 
+// Basic drawing functionality should be rpovided here, as well as basic data
+// structures for things like triangles, quads, textured quads, on-screen text,
+// lines (of varying thicknesses), etc.
+
 #include "GL/gl.h"
 #include "GL/glext.h"
 

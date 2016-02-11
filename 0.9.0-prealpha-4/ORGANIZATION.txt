@@ -364,3 +364,25 @@ sane behavior.
 For example, if I start in game mode, it could either create a default game from
 scratch, load the most recent game (auto "continue game"), or it could load an
 empty game. The empty game (if chosen) should not crash.
+
+********************************************************************
+
+How will rendering work?
+
+The *cores are defining data structures that can / will be renderable. They
+might also be the ones to do the actual drawing ... maybe?
+
+No, the rendering should be done in *driver code. Have an OutputInterface that
+can have either GL or ASCII behind it; systems call that and set up data in
+structures owned by the interface. The systems *do not* own the structures that
+get rendered, they just push their own data upstream. These are all held in the
+appropriate core until time to render.
+
+Now we can saw that:
+ - update() tells all systems to push data up to the *core. The core will work out
+   what gets displayed and how to do it.
+
+ - render() should go to the *core, which in turn calls the driver with its data
+   to write to screen.
+
+So, how will the renderer tie into the main loop?

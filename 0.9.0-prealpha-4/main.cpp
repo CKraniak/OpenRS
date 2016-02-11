@@ -23,6 +23,12 @@
 // Can't pollute other files if other files never see this crap.
 static void * global_addr = nullptr;
 
+const int GAME_GRID_HEIGHT = 15;
+const int GAME_GRID_WIDTH  = 15;
+
+const int FIXED_WINDOW_HEIGHT = 600;
+const int FIXED_WINDOW_WIDTH  = 800;
+
 // Class to give main the interface it needs to other pieces.
 class MLInterface {
     bool quit_;
@@ -38,8 +44,8 @@ public:
         quit_(false),
         display_text("INIT"),
         font(NULL),
-        adces(45, 17),
-        pmces(45 / 2, 17 / 2),
+        adces(GAME_GRID_WIDTH, GAME_GRID_HEIGHT),
+        pmces(GAME_GRID_WIDTH / 2, GAME_GRID_HEIGHT / 2),
         old_font(NULL){}
     void update();
     void render();
@@ -90,7 +96,7 @@ bool MLInterface::createMainWindow(HINSTANCE h_inst,
                                 "Test",
                                 WS_OVERLAPPED | WS_CAPTION, // no resize
                                 CW_USEDEFAULT, CW_USEDEFAULT,
-                                640, 480,
+                                FIXED_WINDOW_WIDTH, FIXED_WINDOW_HEIGHT,
                                 NULL, NULL,
                                 h_inst,
                                 NULL);
@@ -134,7 +140,8 @@ void MLInterface::setFont(HDC dc) {
         lf.lfWeight = FW_HEAVY;
         font = CreateFontIndirect(&lf);
         if(font == NULL) {
-            font = *static_cast<HFONT*>(GetStockObject(ANSI_FIXED_FONT));
+            // If this doesn't work, it *could* need to be HFONT* instead.
+            font = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
         }
     }
     // Again, should only need to get old_font once
@@ -225,6 +232,9 @@ LRESULT CALLBACK MLInterface::MainWndProc(HWND h_wnd,
         EndPaint(h_wnd, &ps);
         return 0;
     }
+
+    case WM_ERASEBKGND:
+        return 1;
 
     case WM_PRINTCLIENT: {
         this_->asciiDraw(reinterpret_cast<HDC>(w_param));

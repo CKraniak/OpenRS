@@ -63,6 +63,8 @@ public:
                                        std::vector<std::string> argv) {}
 };
 
+const int DEFAULT_GROUND_ASCII_CHAR = 176;
+
 // The first system should be an AsciiDisplaySystem. It will take entities with
 // components "locationx", "locationy", and "asciidisplaychar". Right now, I
 // will not be handling the case of multiple things in the same location.
@@ -79,7 +81,7 @@ public:
     AsciiDisplayCESystem(int width, int height) :
             width_(width),
             height_(height),
-            grid_(width * height, '.') {
+            grid_(width * height, DEFAULT_GROUND_ASCII_CHAR) {
         grid_[width * height / 2] = 'P';
     }
     std::vector<char> getRenderData();
