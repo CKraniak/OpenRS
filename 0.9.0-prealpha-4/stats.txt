@@ -1,0 +1,47 @@
+      46 text files.
+classified 46 files      46 unique files.                              
+      20 files ignored.
+
+http://cloc.sourceforge.net v 1.64  T=0.14 s (255.0 files/s, 37993.2 lines/s)
+---------------------------------------------------------------------------------------------------
+File                                                            blank        comment           code
+---------------------------------------------------------------------------------------------------
+.\dispatcher\booleancombinationtreegenerator.cpp                   91             62            709
+.\fileio\pngloader.cpp                                             58             87            479
+.\graphics\glfunctionfinder.cpp                                    41             36            460
+.\main.cpp                                                         26             25            222
+.\fileio\cesio.cpp                                                 26             26            186
+.\dispatcher\dispatcher.h                                          32            116            184
+.\dispatcher\booleancombinationtree.cpp                            18             12            132
+.\fileio\pngloader.h                                               33            131            104
+.\graphics\glcore.cpp                                              23             10             92
+.\graphics\glfunctionfinder.h                                      27             31             88
+.\dispatcher\booleancombinationtreegenerator.h                     15             69             85
+.\ces\cesystem.cpp                                                  6             10             82
+.\dispatcher\dispatcher.cpp                                        13            131             75
+.\dispatcher\gameeventhandler.h                                    25            136             66
+.\fileio\cesio.h                                                   12             23             61
+.\ces\cesystem.h                                                   20             43             61
+.\graphics\glcore.h                                                17             12             57
+.\dispatcher\booleancombinationtree.h                              11             39             48
+.\ces\component.h                                                  11             23             45
+.\dispatcher\gameevent.h                                           11             41             44
+.\utility.h                                                         6             12             33
+.\ces\entity.h                                                      5             22             26
+.\dispatcher\gameeventhandler.cpp                                   2             11             17
+.\dispatcher\statefuldispatcher.h                                   9             53             14
+.\CMakeLists.txt                                                   13             43             14
+.\ces\systemgroup.h                                                 4             12             13
+.\ces\entity.cpp                                                    5             10             13
+.\ces\entitylist.h                                                  5             12              9
+.\ces\componentlist.h                                               5             12              8
+.\ces\ces.h                                                         3             10              6
+.\ces\componentlist.cpp                                             3             10              4
+.\dispatcher\statefuldispatcher.cpp                                 3             10              4
+.\ces\systemgroup.cpp                                               3             10              4
+.\ces\entitylist.cpp                                                3             10              4
+.\ces\component.cpp                                                 2             11              1
+.\dispatcher\gameevent.cpp                                          2             13              0
+---------------------------------------------------------------------------------------------------
+SUM:                                                              589           1324           3450
+---------------------------------------------------------------------------------------------------

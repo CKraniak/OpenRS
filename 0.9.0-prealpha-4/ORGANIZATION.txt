@@ -1,0 +1,366 @@
+Core modules:
+- Dispatcher (event system core)
+  - GameEvent
+    - BooleanCombinationTree
+    - BooleanCombinationTreeGenerator
+  - GameEventHandler
+- GlFunctionFinder (like a custom GLEW)
+- GlCore
+- CesCore
+  - Entity
+  - EntityList
+  - Component
+  - System
+  - SystemGroup
+
+An entity has components, which may or may not have systems that depend on them.
+
+So there will be a top-level entity or entity-list? No. -- yes, sort of
+
+LocalSystem vs. GlobalSystem types? No. -- still no, but a SystemGroup is defined
+
+Data is owned by Components, which are used by systems, which essentially
+iterate over lists of entitys with agreeable component types.
+
+The main loop will invoke systems, which look up the needed entitys and call
+other systems as needed. A system may be active or inactive, depending on
+whether the main loop should default to calling it, and activity may depend on
+the game's "state". So in state "getinfo", the InfoDisplay system is active.
+
+Game loop pseudocode:
+- Call state-active systems in the order defined by the state
+  - Main thing changed by the state is the input-handling and the rendering
+- State switches are usually decided by certain inputs, but may be automatic
+
+States:
+- init
+  - ?
+- menu
+  - main_menu
+    - ACT: getinput
+      - active inputs are arrow keys, enter, escape, backspace
+    - ACT: render
+  - pause_menu
+    - ACT: getinput
+      - active input is esc
+    - ACT: render
+  - help_menu
+    - ACT: getinput
+      - active input not determined yet
+    - ACT: render
+  - options_menu_frommain
+    - ACT: getinput
+      - active input not determined yet
+    - ACT: render
+  - options_menu_fromgame
+    - ACT: getinput
+      - active input not determined yet
+    - ACT: render
+- game
+  - init
+  - exit
+  - base
+    - ACT: getinput
+      - active inputs are numpad keys, F1, esc, mouse, and state_change keys
+  - get_info
+  - interact
+  - build
+  - worldmap
+  - districtmap
+
+******************************************
+
+Entity types needed:
+- Player
+- Monster
+- MedKit
+- Door
+- Shelf
+- Weapon
+
+Components needed for each:
+- Player:
+  - Health
+  - MaxHealth
+  - AttackPower
+  - Position
+  - EquippedItem
+  - Inventory
+  - Sprite
+  - Alliance
+  - InfoText
+  - RenderType
+- Monster:
+  - Health
+  - MaxHealth
+  - AttackPower
+  - Position
+  - AI
+  - EquippedItem
+  - Sprite
+  - Alliance
+  - InfoText
+  - RenderType
+- MedKit
+  - Value
+  - Position
+  - Sprite
+  - InfoText
+  - RenderType
+- Door
+  - State
+  - Position
+  - Sprite
+  - RenderType
+- Weapon
+  - Type (ranged vs. melee)
+  - Power
+  - Position
+  - Sprite
+  - InfoText
+  - RenderType
+
+RenderType:
+  - menu
+  - gamegrid
+  - none (not needed, nonexistence of RenderType component implies "none")
+  - gameconsole
+  - inventorygrid
+  - gamemap
+
+Systems:
+  - Combat
+  - Render
+  - Collision
+    - Calls combat system on collision of entitys with enemy alliances
+    - Calls interaction system on collision of entitys with allied alliance
+  - Movement
+    -
+  - Input
+    - Calls movement system on movement input (numpad keys, mostly)
+    -
+  - InfoDisplay
+  - State (?)
+    - Kind of modifies the behavior of most other systems:
+      - Input will move menus around, but does a bit more in an in-game state
+      - There is no menu combat
+      - There is no menu collision
+      - If in a "getinfo" state, most inputs get supressed, except mouse
+
+************************************************************
+
+Menu Entity Types:
+- BasicSelection
+- Radio
+- Checkbox
+- Slider
+- NumericInput
+
+
+- BasicSelection
+  - in_menu
+  - text
+  - text_color
+- Radio
+  - in_menu
+- RadioItem
+  - in_radio
+  - text
+etc.
+
+Menu audio:
+  - audio = soundofsilence
+
+Entity: mainmenu:
+  - menu_order_resolution_rule:
+    - Continue Game
+    - New Game
+    - Load Game
+    - unlisted_new_by_placenum_then_alphabetical
+    - Options
+    - About
+    - Exit
+  - background_color = 0x000000ff (rgba)
+  - selected = 0
+  - menu_name = "main"
+  - check_continuegame_on_activate = true
+
+Buttons:
+- type: BasicSelection
+  - text = "New Game"
+  - text_color = 0xeeeeeeff (rgba)
+  - in_menu = "main"
+  - on_selected = "new_game"
+- type: BasicSelection
+  - text = "Load Game"
+  - text_color = 0xeeeeeeff (rgba)
+  - in_menu = "main"
+  - on_selected = "load_game"
+etc.
+
+ButtonOrder:
+  - list of Button entitys
+
+***************************************************************
+
+Minimalist start:
+- Set init_mainmenu as the new state
+- Jump into the update loop
+- Update loop sees new state, calls state-init with previous state info intact
+  - init_mainmenu loads / activates mainmenu entity
+  - init_mainmenu loads all entitys with in_menu = "main"
+  - init_mainmenu sets new state to menu
+- State switch event is generated, currently nobody cares except state tracker
+- update called, sees state "menu":
+  - grabs main menu background color and text
+  - updates menu render structure
+- Renderer renders
+- Loop renderer (with no state updates) while waiting for input
+  - Takes care of window movement and resizes, minimization, etc.
+- Input of either enter or arrow key
+  - If enter, get selected's on_selected and looks up associated switching rule
+  - If arrow, find new selected
+  - need_update is set if need be
+
+*****************************************************************
+
+Need:
+- Generic menu updating function
+- Generic menu input handling function
+
+****************************************************************
+
+on_selected("new_game"):
+- deactivate_current_menu
+- activate_menu = "newgame"
+
+on_selected("game_init"):
+- deactivate_current_menu (if prev. state was a menu)
+- activate_game = game_properties
+
+Game:
+- turn
+- district_list
+- width
+- height
+
+District:
+- terrain_list
+- entity_list
+- environment
+- width
+- height
+
+*******************************************************************
+
+Begin game:
+- Create game entity, populate
+  - Creates districts, populates each, given environment, width, and height
+    - Populate terrain_list using whichever generator
+    - Populate entity_list using whatever generator
+- Input then goes to:
+  - movement system (numpad keys)
+  - state changing (currently none)
+- Movement system, given input, default method will be:
+  - get the current movement_target (retrieved from district)
+    - has components "location", "move_type=numpad"
+  - apply input to movement_target if no collision, otherwise resolve collision
+  - if all movement_targets processed, send "increment_turn" event
+- AI system
+  - have list of objects with "AI" component
+  - for alpha 1, only a simple_enemy_1 AI will be defined
+  - call the defined AI script / function
+    - simple_enemy_1 will find the shortest path to an object of
+        player_alleigance, and return request to move toward / attack player
+- Combat system
+  - Given an attacker entity (has "AttackPower", optionally an attack modifier)
+  - Given a defender entity (has "Health", "Armor", any modifiers of the two)
+  - Determines damage to apply to defender using whatever formula / RNG
+  - Applies damage
+  - Sends message to defender, if applicable
+    - either run on_attacked or on_killed or somesuch
+    - default on_attacked is nothing
+    - default on_killed removes entity from district's entity_list
+
+**************************************************************************
+
+New sequence:
+ - Start
+ - Create: entity list, component list, and system group
+   - The state machine is in system group
+ - Get the starting state from somewhere
+ - Send the state change event
+ - Enter loop, loop while quit has not been set:
+   - Empty message pump
+   - Update call against any systems marked behind (they would mark themselves
+     in response to certain events being generated from input handling)
+   - Render if the screen has been marked invalid
+
+Everything now comes down to how the systems interact with one another and the
+events. First point is that systems communicate rather exclusively through
+events. Second point is that event functionality depends on the handlers and
+the states they are listening for.
+
+THE STATE IS WHAT DETERMINES EVERYTHING!
+
+So we start off in a state "init". The systems who need to do things in this
+state would have event handlers registered with "on_state_change=init" handlers.
+
+What comes after "init", and when is it triggered?
+
+Let's see, in "init" we will be initializing OpenGL and loading everything out
+of files. When subsystems are done, they can send "im_ready" events, and there
+can be a special system that switches to the main menu state (configurable)
+once all of the "ready" events it needs are fired.
+
+It then switches to the main menu state (or whichever state is configured).
+The event "on_state_change=mainmenu" fires, and the entity loader that has the
+responsibility for populating the main menu makes the main menu entity following
+its recipe. The system calls update next, which would iterate over the systems
+that registered themselves for mainmenu state updates. (This would likely just
+be the system sending out an event {"state_mainmenu", "on_update"}.) Similarly
+for rendering.
+
+It then actually gets to the main loop, which applies inputs, updates, and
+renders, as is tradition. Just remember that the handlers used are selected by
+the state.
+
+So how does a rendered state transition work? Say, from the game screen to the
+options menu?
+
+Starting from the game state in the main loop, you'll see an input that calls
+the "options" state, maybe "esc", "o", or possibly "F2". It would call the
+state change function in the dispatcher, with state "menu_options". The
+dispatcher emits an event with type {"on_state_change=menu_options"}. The things
+that would need to care respond: the menu system makes its entities, primarily.
+Then when update is called with the new state, it would perform ... nothing?
+Well, since the menu has theoretically just now been initialized, it should
+already be in an updated state. Render will definitely run, but the form of
+what's rendered may vary.
+
+**********************************************************************
+
+I think it's clear I will need a few standard renderers that get called from a
+variety of states, and with a variety of entities controlling their appearances.
+
+The first renderer is the menu renderer. It'll get fullscreen menus.
+
+The second renderer is the game renderer. It renders, duh, the game.
+
+The third one is the fancy one. It'll be a game overlay renderer. The game will
+be behind the menu, with the menu centered in the screen. This may end up being
+an extension of the box overlay that puts small informational boxes in either
+top corner, with the added caveat that the game is paused while the menu is
+active, and the input goes into a menu state. So this is basically a subset of
+the second renderer, except with wider consequences.
+
+*********************************************************************
+
+Every state should be capable of being the post-init state while a.) not
+crashing the game and b.) ability to return to a reasonable state and c.) any
+needed entities that don't exist are conjured up, or their absense triggers a
+sane behavior.
+
+For example, if I start in game mode, it could either create a default game from
+scratch, load the most recent game (auto "continue game"), or it could load an
+empty game. The empty game (if chosen) should not crash.
