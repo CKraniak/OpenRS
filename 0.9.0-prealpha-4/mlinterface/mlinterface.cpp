@@ -9,9 +9,10 @@
 
 
 // This is the OS-specific selector
-std::unique_ptr<MLInterface> MLInterface::getInterface() {
+std::unique_ptr<MLInterface>
+MLInterface::getInterface(StatefulDispatcher * disp) {
 #if defined(_WIN32)
-    std::unique_ptr<MLInterface> ptr(new MLInterfaceWindows());
+    std::unique_ptr<MLInterface> ptr(new MLInterfaceWindows(disp));
     ptr.get()->init_();
     return ptr;
 #else

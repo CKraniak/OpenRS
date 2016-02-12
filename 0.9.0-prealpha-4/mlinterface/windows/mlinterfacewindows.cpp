@@ -116,8 +116,8 @@ void MLInterfaceWindows::unsetFont(HDC dc) {
     }
 }
 
-MLInterfaceWindows::MLInterfaceWindows() :
-        MLInterface(),
+MLInterfaceWindows::MLInterfaceWindows(StatefulDispatcher * disp) :
+        MLInterface(disp),
         display_text("INIT"),
         font(NULL),
         adces(GAME_GRID_WIDTH, GAME_GRID_HEIGHT),
@@ -127,11 +127,14 @@ MLInterfaceWindows::MLInterfaceWindows() :
     cmd_show_opt = win_cmd_show_opt;
 }
 
+// Artifact from moving MLInterface. Contents may be moved into init_() and
+// the function deleted later.
 void MLInterfaceWindows::setThisAsGlobalAddr()
 {
     global_addr = this;
 }
 
+// Now that the dispatcher is available, it needs to be used here.
 LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
                                                  UINT msg,
                                                  WPARAM w_param,

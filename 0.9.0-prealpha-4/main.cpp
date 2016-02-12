@@ -10,9 +10,17 @@
  */
 
 #include "mlinterface/mlinterface.h"
+#include "dispatcher/statefuldispatcher.h"
 
 int openrs_main(int argc, char** argv) {
-    std::unique_ptr<MLInterface> mli = MLInterface::getInterface();
+    // - Start event system. Since this is the big intra-communication device,
+    //   it will generally come first.
+    StatefulDispatcher sd = StatefulDispatcher();
+
+    // - TODO: Process command-line args and config file here
+
+    // - Start OS-specific code
+    std::unique_ptr<MLInterface> mli = MLInterface::getInterface(&sd);
     mli.get()->createMainWindow();
     while ( ! mli.get()->shouldQuit() ) {
         // main loop:

@@ -35,7 +35,7 @@ class MLInterfaceWindows : public MLInterface {
     }
 
 public:
-    MLInterfaceWindows();
+    MLInterfaceWindows(StatefulDispatcher *);
     void update();
     void render();
     void emptyMessagePump();
