@@ -1,0 +1,34 @@
+CONTRIBUTING:
+
+There's usually good ways to contribute. Let me think of the list
+of things that needs to be done ... I know I've got a decent list
+in some of my older commits as "plans".
+
+My overall goal is to rely on zero libraries if at all possible.
+LibPNG is out. SDL, GLFW, and GLEW are out. An allowance is made for
+Boost only, and even then I am sticking to header-only. I'm doing this
+because I enjoy the challenge, and because it should make jumping in
+and building a bit more straightforward, albeit a bit more challenging.
+
+Needed:
+ - Implement INFLATE; it should go in a .cpp besides pngloader.cpp
+ - Implement an Image class
+ - Finish implementing PngLoader; this will need Image and INFLATE
+ - OpenGL capability, which will need PngLoader for textures
+ - Menu capability
+ - Finish the component entity system (this should probably be left to me)
+ - Test the Dispatcher
+ - Transition current, bacis system code for movement to use Dispatcher
+ - Quarantining platform-dependent code
+   - This is mostly kept in GLFunctionFinder, main, and utility.h.
+     Although fairly soon, I intend to do directory listing with Windows
+     API calls, so the directory searcher will probably end up on this
+     list.
+
+At this point, I'm pretty easy. I'll probably be stoked if you care
+enough to get involved. Clone my repo, do some stuff, and send a
+pull request; we'll see how it goes.
+
+Do refer to the CODING_STYLE document. I will probably critique your
+code. Nothing is meant by it, other than it's good enough for me to
+want to see improved so I can merge it.

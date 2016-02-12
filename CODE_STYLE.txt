@@ -1,0 +1,65 @@
+OVERALL:
+
+I do have some things I prefer, and some things I don't care about.
+If / when someone else jumps in to help, we can flesh out better
+expectations at that time. I'm not likely to be able to list
+everything I want in a pull request until I see one and can tell
+what I care about.
+
+ - Naming conventions:
+   - Classes are capitalized camel-case
+   - Structs are auto-public classes in C++, and are named like
+     classes too
+   - Enums are capitalized (LIKE_THIS), both for the enum name
+     and its values
+   - Local variables are lowercase, underscore separated
+   - functions are leading-lowercase camel-case
+   - Class variables generally have a trailing underscore 
+     - "int variable_;"
+   - Global constants are fully capitalized (LIKE_THIS)
+
+ - Design:
+   - Game features should use the CES and the dispatcher system
+     where possible. Certain core components may not be able to
+     follow this, but anything working with entities should be
+     a system, and anythign working on game logic data should
+     be working with entities
+     - In particular, systems are NEVER allowed to directly
+       communicate with one another
+   - Either completely avoid platform-dependent things,
+     segregate them, or make it to where changing things out
+     is as easy as possible for the poor souls who need to fix
+     platform dependencies later
+   - No global variables; the global_addr variables are a special
+     case that exists only to get around a limitation in Microsoft's
+     callback capability
+     - Constants may, however, be global
+
+ - I don't care where brackets go; end of line or next line, it's
+   all the same
+
+ - Always put prackets on ifs. Always.
+
+ - Use C++11 smart pointers when you need a pointer
+   - Some old code needs to change to reflect this, but as long as
+     it's working it will probably stay
+   - Required of all new code
+
+ - Always put the license agreement in the top of new files
+   - Remember to change the names as appropriate
+
+ - Comment things, but don't comment things that are obnoxiously
+   self-evident
+   - As of right now, discussing your thoughs about what the class
+     should be doing is desirable; see a lot of my code in
+     the Dispatcher and CES systems for reference
+
+ - I hate exceptions, and prefer return values, but I won't tell
+   you not to use exceptions yourself
+
+ - Be sure your code builds on your system and doesn't break current
+   functionality; give it a sniff test before sending a pull request
+
+ - Add public static void test funcitons to classes if you were doing
+   some tests; there's no reason to throw away decent test code when
+   we'll probably be able to use the tests for unit testing later
