@@ -9,9 +9,3 @@
  * for the license.
  */
 #include "systemgroup.h"
-
-SystemGroup::SystemGroup()
-{
-
-}
-

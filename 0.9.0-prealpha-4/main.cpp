@@ -11,11 +11,13 @@
 
 #include "mlinterface/mlinterface.h"
 #include "dispatcher/statefuldispatcher.h"
+#include "ces/systemgroup.h"
 
 int openrs_main(int argc, char** argv) {
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
     StatefulDispatcher sd = StatefulDispatcher();
+    SystemGroup systems(&sd);
 
     // - TODO: Process command-line args and config file here
 

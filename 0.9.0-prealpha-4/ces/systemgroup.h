@@ -11,19 +11,33 @@
 #ifndef SYSTEMGROUP_H
 #define SYSTEMGROUP_H
 
-// #include "../dispatcher/dispatcher.h"
+#include <vector>
+#include <memory>
+
+#include "cesystem.h"
+#include "../dispatcher/statefuldispatcher.h"
+
+// So how would systems be hooked in?
+
+// Clearly, any system that needs to be hooked in ought to be hooked in by
+// the SystemGroup itself.
+//
+// NO, it will be the caller's responsibility. It should be possible to have
+// more than one system group, and that only makes sense if the SystemGroup
+// works more like a dumb container.
+//
+// main will simply have to do the necessary hooking in and option
+// interpretation. Or some delegate of main. Either way, upstream of this class.
 
 class SystemGroup
 {
-    // Will probably add AUDIO later
-    typedef enum {
-        INPUT,
-        RENDER,
-        GAME
-    } SYSTEM_TYPE;
+    std::vector<std::shared_ptr<CESystem>> systems_;
+    std::shared_ptr<StatefulDispatcher> disp_;
 
 public:
-    SystemGroup();
+    SystemGroup(StatefulDispatcher * disp) :
+        disp_(disp) {}
+    bool connectSystem(CESystem * system);
 };
 
 #endif // SYSTEMGROUP_H
