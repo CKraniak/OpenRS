@@ -125,14 +125,6 @@ class AsciiCoreWindow {
     friend class AsciiCore;
 };
 
-class AsciiCoreViewport {
-    AsciiCoreGrid grid_;
-
-    void updateGrid();
-
-    friend class AsciiCore;
-};
-
 using AsciiCoreWindowTable = std::map<int, AsciiCoreWindow>;
 
 // Manages windows and viewports. Neither windows nor viewports can be accessed

@@ -386,3 +386,6 @@ Now we can saw that:
    to write to screen.
 
 So, how will the renderer tie into the main loop?
+
+********************************************************************
+
