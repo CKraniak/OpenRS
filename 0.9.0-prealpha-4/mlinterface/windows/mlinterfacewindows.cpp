@@ -54,12 +54,26 @@ bool MLInterfaceWindows::winCreateMainWindow(HINSTANCE h_inst,
         ERR_MSGOUT_GLE("MLInterface::createMainWindow RegisterClassEx failed");
         return false;
     }
+
+    // Get the window size needed to get the desired client size
+    RECT r;
+    r.top    = 0;
+    r.left   = 0;
+    r.bottom = FIXED_WINDOW_HEIGHT;
+    r.right  = FIXED_WINDOW_WIDTH;
+    if (AdjustWindowRectEx(&r, WS_OVERLAPPED | WS_CAPTION, FALSE, 0) == 0) {
+        ERR_MSGOUT_GLE("Can't get rect size for proper window dimensions");
+        return false;
+    }
+    int width  = r.right - r.left;
+    int height = r.bottom - r.top;
+
     HWND h_wnd = CreateWindowEx(0,
                                 "ORS_MAIN_WINDOW_CLASS",
                                 "Test",
                                 WS_OVERLAPPED | WS_CAPTION, // no resize
                                 CW_USEDEFAULT, CW_USEDEFAULT,
-                                FIXED_WINDOW_WIDTH, FIXED_WINDOW_HEIGHT,
+                                width, height,
                                 NULL, NULL,
                                 h_inst,
                                 NULL);
@@ -78,14 +92,33 @@ bool MLInterfaceWindows::winCreateMainWindow(HINSTANCE h_inst,
 }
 
 void MLInterfaceWindows::asciiDraw(HDC dc) {
-    RECT r;
-    clearWindow(dc, r);
-    setFont(dc);
+    // TODO: Check return values for failure
+    // TODO: Clean up after adding double buffer code
+    HDC back_dc = CreateCompatibleDC(dc);
+    HBITMAP back_bmp = CreateCompatibleBitmap(dc,
+                                              FIXED_WINDOW_WIDTH,
+                                              FIXED_WINDOW_HEIGHT);
+    HBITMAP old_bmp = static_cast<HBITMAP>(SelectObject(back_dc, back_bmp));
+    BitBlt(back_dc,
+           0, 0, FIXED_WINDOW_WIDTH, FIXED_WINDOW_HEIGHT,
+           dc,
+           0, 0,
+           WHITENESS);
+    RECT r = {0, 0, 0, 0};
+    clearWindow(back_dc, r);
+    setFont(back_dc);
     std::vector<char> new_text = adces.getRenderData();
     std::string new_text_str(new_text.begin(), new_text.end());
     display_text = new_text_str;
-    DrawText(dc, display_text.c_str(), display_text.size(), &r, DT_NOCLIP);
-    unsetFont(dc);
+    DrawText(back_dc, display_text.c_str(), display_text.size(), &r, DT_NOCLIP);
+    BitBlt(dc,
+           0, 0, FIXED_WINDOW_WIDTH, FIXED_WINDOW_HEIGHT,
+           back_dc,
+           0, 0,
+           SRCCOPY);
+    unsetFont(back_dc);
+    DeleteObject(SelectObject(back_dc, back_bmp));
+    DeleteDC(back_dc);
 }
 
 void MLInterfaceWindows::clearWindow(HDC dc, RECT &r) {
