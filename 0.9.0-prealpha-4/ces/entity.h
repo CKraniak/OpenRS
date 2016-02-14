@@ -35,29 +35,4 @@ public:
     int removeComponentById(int);
 };
 
-// A prototype for an entity.
-// Should be able to ask an EntityType object for an Entity, and have the Type
-// build the entity for you, I'd think.
-//
-// The entity type is what gets loaded out of files.
-class EntityType {
-    std::string typename_; // Not required to be the same as the header in
-                           // an entity data file, particularly when the
-                           // entity type is internally generated.
-    std::map<std::string, std::vector<std::string>> components;
-public:
-    Entity makeEntity();
-    bool loadEntityTypeFromFile(std::string filename);
-};
-
-class EntityFactory {
-    std::map<std::string, EntityType> type_map; // typename, entity_type pairs
-
-public:
-    Entity makeEntity(std::string type);
-    bool loadFiles(std::vector<std::string> filename_vec);
-    void pushNewType(std::string typename_, EntityType & type_);
-    void removeType(std::string typename_);
-};
-
 #endif // ENTITY_H

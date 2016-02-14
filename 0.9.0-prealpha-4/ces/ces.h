@@ -16,4 +16,6 @@
 #include "component.h"
 #include "cesystem.h"
 
+#include "systems/systems.h"
+
 #endif // CES_H

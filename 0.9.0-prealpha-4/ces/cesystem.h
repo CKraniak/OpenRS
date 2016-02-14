@@ -19,12 +19,7 @@
 
 #include "entity.h"
 #include "component.h"
-
-class EntitySignature {
-public:
-    std::vector<Component> components_in_signature;
-    bool entityMatchesSignature(Entity & e);
-};
+#include "entitysignature.h"
 
 // :TODO: move most of these specific system definitions into better places.
 
@@ -61,66 +56,6 @@ class ScriptedCESystem : public CESystem {
 public:
     virtual int callScriptableFunction(std::string  function_name,
                                        std::vector<std::string> argv) {}
-};
-
-const int DEFAULT_GROUND_ASCII_CHAR = 176;
-
-// The first system should be an AsciiDisplaySystem. It will take entities with
-// components "locationx", "locationy", and "asciidisplaychar". Right now, I
-// will not be handling the case of multiple things in the same location.
-class AsciiDisplayCESystem : public CESystem {
-    std::vector<char> grid_;
-    int width_;
-    int height_;
-
-    // updateGrid will iterate over the entities and push their chars to the
-    // locations specified. Any
-    void updateGrid(std::vector<Entity> & adces_entities);
-
-public:
-    AsciiDisplayCESystem(int width, int height) :
-            width_(width),
-            height_(height),
-            grid_(width * height, DEFAULT_GROUND_ASCII_CHAR) {
-        grid_[width * height / 2] = 'P';
-    }
-    std::vector<char> getRenderData();
-    bool setGridChar(char c, int x, int y);
-};
-
-// Input should operate on things that define some kind of on_<input> behavior
-// e.g. "on_numpad" for a component name.
-// Full list of supported components:
-//   - on_numpad
-//   - on_esc
-// Behaviors called are shown in the value of the on_<input> component.
-//
-// on_esc should hook into the input handler for now, to get the main loop to
-// break out.
-//
-// on_numpad will probably only be run by the player entity for now. It's
-// behavior will probably be something to point to a routine internal to the
-// MovementSystem. Perhaps:
-//     "on_numpad=run_system(MOVEMENT, <func_name>, entity_id)"
-// I'll need something that can resolve this to the right thing. Maybe a script
-// system that, in a barebones state, only supports the "run_system" call.
-struct KeyInData;
-
-class InputCESystem : public CESystem {
-
-public:
-    // Push needed components
-    int onInput(KeyInData in);
-};
-
-class PlayerMovementCESystem : public ScriptedCESystem {
-    int pos_x;
-    int pos_y;
-public:
-    PlayerMovementCESystem(int x, int y) : pos_x(x), pos_y(y) {}
-    int onNumpad(char , AsciiDisplayCESystem &); // Apply a transform to the
-                                               // player object
-
 };
 
 #endif // CESYSTEM_H
