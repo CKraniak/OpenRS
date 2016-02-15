@@ -21,8 +21,6 @@
 #include "component.h"
 #include "entitysignature.h"
 
-// :TODO: move most of these specific system definitions into better places.
-
 class CESystem
 {
     // List of entity objects cached for quick operation
@@ -49,6 +47,11 @@ public:
     virtual int run(std::vector<Entity> & entity_list) {}
 };
 
+// Subclasses of a ScriptedCESystem are meant to fill the script function map
+// themselves. I want to be able to put:
+//     "run_system(MOVEMENT, playerMove, __MYID__)"
+// in a data file and it be able to ask the Movement system for the playerMove
+// function (from the map here), and pass it an argument of "__MYID__".
 class ScriptedCESystem : public CESystem {
     using scriptable_function = int (*)(std::vector<std::string>);
     std::map<std::string, scriptable_function> script_function_map;

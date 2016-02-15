@@ -37,7 +37,10 @@ class SystemGroup
 public:
     SystemGroup(StatefulDispatcher * disp) :
         disp_(disp) {}
-    bool connectSystem(CESystem * system);
+    bool connectSystem(CESystem * system) {
+        systems_.push_back(std::shared_ptr<CESystem>(system));
+        return true;
+    }
 };
 
 #endif // SYSTEMGROUP_H

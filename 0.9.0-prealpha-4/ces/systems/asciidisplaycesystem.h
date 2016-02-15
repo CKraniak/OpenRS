@@ -3,6 +3,9 @@
 
 #include "../cesystem.h"
 
+const int DEFAULT_GAMEGRID_WIDTH  = 15;
+const int DEFAULT_GAMEGRID_HEIGHT = 15;
+
 const int DEFAULT_GROUND_ASCII_CHAR = 176;
 
 // The first system should be an AsciiDisplaySystem. It will take entities with
@@ -18,7 +21,8 @@ class AsciiDisplayCESystem : public CESystem {
 	void updateGrid(std::vector<Entity> & adces_entities);
 
 public:
-	AsciiDisplayCESystem(int width, int height) :
+    AsciiDisplayCESystem(int width = DEFAULT_GAMEGRID_WIDTH,
+                         int height = DEFAULT_GAMEGRID_HEIGHT) :
 			width_(width),
 			height_(height),
 			grid_(width * height, DEFAULT_GROUND_ASCII_CHAR) {
