@@ -38,6 +38,7 @@ class ComponentList
 
 public:
     ComponentList();
+    Component getComponentById(int id);
 };
 
 #endif // COMPONENTLIST_H

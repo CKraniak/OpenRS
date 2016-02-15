@@ -15,11 +15,12 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <algorithm>
+#include <memory>
 
 #include "entity.h"
 #include "component.h"
 #include "entitysignature.h"
+#include "../dispatcher/statefuldispatcher.h"
 
 class CESystem
 {
@@ -36,6 +37,9 @@ class CESystem
     // Maybe have an applyToEntities that runs a lambda or somesuch over all of
     // the entities?
 
+    // Dispatcher the entity gets events from
+    std::shared_ptr<StatefulDispatcher> disp_;
+
 protected:
     void pushNeededSignature(EntitySignature & sig) {
         signatures_handled_.push_back(sig);
@@ -45,6 +49,7 @@ public:
     CESystem();
     bool entityHasNeededComponents(Entity & e);
     virtual int run(std::vector<Entity> & entity_list) {}
+    bool connectDispatcher(StatefulDispatcher *);
 };
 
 // Subclasses of a ScriptedCESystem are meant to fill the script function map

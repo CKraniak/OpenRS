@@ -4,5 +4,6 @@
 #include "asciidisplaycesystem.h"
 #include "inputcesystem.h"
 #include "playermovementcesystem.h"
+#include "loadentitycesystem.h"
 
 #endif // SYSTEMS_H

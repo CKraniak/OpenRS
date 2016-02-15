@@ -9,3 +9,9 @@
  * for the license.
  */
 #include "systemgroup.h"
+
+bool SystemGroup::connectSystem(CESystem *system) {
+    system->connectDispatcher(disp_.get());
+    systems_.push_back(std::shared_ptr<CESystem>(system));
+    return true;
+}

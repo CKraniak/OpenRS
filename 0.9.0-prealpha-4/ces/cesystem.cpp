@@ -15,3 +15,9 @@ CESystem::CESystem()
 {
 
 }
+
+bool CESystem::connectDispatcher(StatefulDispatcher * disp)
+{
+    disp_ = std::shared_ptr<StatefulDispatcher>(disp);
+    return true;
+}
