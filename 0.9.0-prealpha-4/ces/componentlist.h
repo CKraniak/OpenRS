@@ -11,13 +11,31 @@
 
 // As the components are listed by ID in the entities, there needs to be a way
 // to grab the components from somewhere.
+//
+// There will actually be a "main list" somewhere, but this class handles the
+// more general case of N Components, and queryign certain kinds of information
+// on the N components.
 
 #ifndef COMPONENTLIST_H
 #define COMPONENTLIST_H
 
+#include <vector>
+#include <map>
+#include <memory>
+
+#include "component.h"
+
+struct ComponentIdList {
+    std::vector<int> id_list_;
+};
 
 class ComponentList
 {
+    ComponentIdList id_list_;
+    std::map<int, std::shared_ptr<Component>>  coomponent_id_map_;
+
+    int getFirstUnusedId();
+
 public:
     ComponentList();
 };

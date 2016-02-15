@@ -16,11 +16,12 @@
 #include <map>
 
 #include "../fileio/cesio.h"
+#include "componentlist.h"
 
 class Entity
 {
     int id_;
-    std::vector<int> component_id_list_;
+    ComponentList component_list_;
     std::string entity_type_name_; // e.g. "district", "player", "monster"
                                    // entity_type_name is only for readability;
                                    // any use in game logic is an error, as

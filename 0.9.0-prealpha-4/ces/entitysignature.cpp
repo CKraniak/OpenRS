@@ -1,6 +1,6 @@
 #include "entitysignature.h"
 
-EntitySignature::EntitySignature(ComponentList & cl)
+bool EntitySignature::entityMatchesSignature(Entity &e)
 {
 
 }
