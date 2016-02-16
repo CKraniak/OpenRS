@@ -35,6 +35,7 @@ class BarebonesScript {
     } SCRIPTABLE_SYSTEM;
     SCRIPTABLE_SYSTEM system_type;
     bool is_compilable;
+    bool emit_event_on_update_;
 
     // run() will call system's script_function() with args function_name and
     // argv. The CESystem is responsible for making the script function

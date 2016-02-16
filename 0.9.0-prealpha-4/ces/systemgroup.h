@@ -38,6 +38,10 @@ public:
     SystemGroup(StatefulDispatcher * disp) :
         disp_(disp) {}
     bool connectSystem(CESystem * system);
+    // Initialize will cause SystemGroup to send an "init" event via the
+    // dispatcher. All connected systems should run their initialization at
+    // that time.
+    int initialize();
 };
 
 #endif // SYSTEMGROUP_H

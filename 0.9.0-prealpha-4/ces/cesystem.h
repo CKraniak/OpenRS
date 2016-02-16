@@ -36,6 +36,9 @@ class CESystem
 
     // Maybe have an applyToEntities that runs a lambda or somesuch over all of
     // the entities?
+    //
+    // Well, no. That's the whole point of subclassing this: to provide
+    // the specific required functionality in the subclass.
 
     // Dispatcher the entity gets events from
     std::shared_ptr<StatefulDispatcher> disp_;

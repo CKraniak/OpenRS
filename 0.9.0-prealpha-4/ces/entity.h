@@ -28,6 +28,7 @@ class Entity
                                    // logic should a.) be in a CESystem and
                                    // b.) rely on the components the entity has,
                                    // to determine what it is, not the name.
+    bool emit_event_on_update_;
     int generateUniqueId();
 public:
     Entity();

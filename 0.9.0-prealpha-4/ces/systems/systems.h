@@ -5,5 +5,6 @@
 #include "inputcesystem.h"
 #include "playermovementcesystem.h"
 #include "loadentitycesystem.h"
+#include "databasecesystem.h"
 
 #endif // SYSTEMS_H

@@ -389,3 +389,24 @@ So, how will the renderer tie into the main loop?
 
 ********************************************************************
 
+Let's see. For the CES master list / database ...
+
+The database cesystem isn't bad. What ops should it need to support?
+
+So upon start, we will specify the load directory in main; this could be config
+controlled. The directory goes to the LoadEntity system. When the systems get
+inited, LoadEntity will load the whole directory, then emit an event to the
+effect of "entities_loaded" with list pointers in the data fields. The database
+will see this event and suck in all the entities from that.
+
+The state will switch to whatever is configured next. So if the state goes to
+"main_menu", the next few things that happen will be:
+- The AsciiDisplay will need the main menu entity; it gets it from the initial
+  "entities_loaded" event or it makes it itself. If it makes it, it has to
+  run an "entity_created" event. If it adds or subtracts components, the
+  appropriate events are emitted, etc.
+- In this state, the Input system emits arrow_key_up and arrow_key_down events,
+  and also an enter_event; the AsciiDisplay will update the current menu
+  selection (which is a component of main_menu) based on the arrow keys and
+  throw events on the updates.
+- The on_enter of each button will say something like ""

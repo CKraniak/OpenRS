@@ -3,6 +3,8 @@
 
 #include "entitytype.h"
 
+// Look into having the factory emit when it creates any entities.
+
 class EntityFactory {
 	std::map<std::string, EntityType> type_map; // typename, entity_type pairs
 

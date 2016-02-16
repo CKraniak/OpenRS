@@ -3,6 +3,10 @@
 
 // I will load entities / keep a master list of entities and components here.
 // I can't think of any good places to put a master list, so here we are.
+//
+// SCRATCH THAT
+//
+// I will only load entities here.
 
 #include <string>
 
@@ -11,7 +15,7 @@
 #include "../componentlist.h"
 #include "../../fileio/directory.h"
 
-class LoadEntityCESystem
+class LoadEntityCESystem : public CESystem
 {
     EntityList entity_list_;
     ComponentList component_list_;

@@ -49,6 +49,13 @@ int openrs_main(int argc, char** argv) {
     // Start OS-specific code in the Main Loop Interface class.
     // Mostly should involve grabbing OS events.
     std::unique_ptr<MLInterface> mli = MLInterface::getInterface(&sd);
+
+    // **************************
+    //
+    // Just before jumping into the game loop, send the "init" command
+    //sd.setState("init");
+
+    // **************************
     mli.get()->createMainWindow();
     while ( ! mli.get()->shouldQuit() ) {
         // main loop:
