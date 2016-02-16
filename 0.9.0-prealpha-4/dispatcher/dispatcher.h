@@ -72,9 +72,6 @@ typedef int eid_t;  // Event ID type
 const ehid_t FIRST_HANDLER_ID = 1;
 const eid_t FIRST_EVENT_ID = 1;
 
-// Forward declare for the signal.
-class Dispatcher;
-
 // Interface to the signals. Serves to isolate the template to subclasses.
 // This is so I can put a std::map<int, SignalBase*> in the Dispatcher
 // without making Dispatcher itself a templated class.
@@ -154,10 +151,15 @@ class Dispatcher
     ehid_t getFirstUnusedHandlerId();
     eid_t  getFirstUnusedEventId();
 
+    // Both of these functions return an invalid handle if the passed-in objects
+    // weren't registered first.
     template <class T> eid_t  getEventId(GameEvent<T> &e);
     template <class T> ehid_t getHandlerId(GameEventHandler<T> &h);
 
-    bool isHandlerInList();
+    bool isHandlerInList(); // I forgot what I was doing with this ...
+
+    // If I need to debog events, a function like this may come in handy
+    //void printEventsToFile();
 
 public:
     Dispatcher() : caller_(this) {}
@@ -177,7 +179,8 @@ public:
                        // "same" events to exist.
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
-    template <class T> int emitEvent(GameEvent<T>& e, bool);
+    template <class T> int emitEvent(GameEvent<T>& e,
+                                     bool register_if_not_present);
     template <class T> int emitEvent(eid_t e_id,
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
@@ -276,6 +279,7 @@ eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
     return new_id;
 }
 
+// Note: register_if_not_present both sregister AND de-registers
 template <class T>
 int Dispatcher::emitEvent(GameEvent<T>& e,
                           bool register_if_not_present = true) {

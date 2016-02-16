@@ -53,7 +53,16 @@ eid_t StatefulDispatcher::makeStateEvent(eid_t e, std::string state)
 
 int StatefulDispatcher::setState(std::string new_state)
 {
+    GameEvent<int> leaving("on_leave", {"on_leave"}, 0);
+    emitEvent<int>(leaving);
 
+    prev_state_ = state_;
+    state_ = STATE_EVENT_TYPE_PREFIX + new_state;
+
+    GameEvent<int> entering("on_enter", {"on_enter"}, 0);
+    emitEvent<int>(entering);
+
+    return 1; // Not currently meaningful.
 }
 
 int StatefulDispatcher::unregisterEvent(eid_t e_id)
@@ -64,5 +73,40 @@ int StatefulDispatcher::unregisterEvent(eid_t e_id)
 StatefulDispatcher::StatefulDispatcher()
 {
 
+}
+
+GE_HND(stateful_dispatcher_test_event_A____, int, "s1 AND state_1", { return 0; })
+GE_HND(stateful_dispatcher_test_event_B____, int, "s1 AND state_2", { return 1; })
+GE_HND(stateful_dispatcher_test_event_C____, int, "s2 AND state_1", { return 2; })
+GE_HND(stateful_dispatcher_test_event_D____, int, "s2 AND state_2", { return 3; })
+GE_HND(stateful_dispatcher_test_event_E____, int, "s3 AND state_1", { return 4; })
+GE_HND(stateful_dispatcher_test_event_F____, int, "s3 AND state_2", { return 5; })
+// The following state can run any event that's not of type "none".
+GE_HND(stateful_dispatcher_test_event_ANY____, int, "NOT none", { return 99; })
+
+void StatefulDispatcher::test()
+{
+    GameEvent<int> e1 = GameEvent<int>("e1", {"s1"}, 0);
+    GameEvent<int> e2 = GameEvent<int>("e2", {"s2"}, 0);
+    GameEvent<int> e3 = GameEvent<int>("e3", {"s3"}, 0);
+    StatefulDispatcher sd;
+    eid_t e1t = sd.registerEvent(e1);
+    eid_t e2t = sd.registerEvent(e2);
+    eid_t e3t = sd.registerEvent(e3);
+    ehid_t h1 = sd.registerHandler<int>(stateful_dispatcher_test_event_A____);
+    ehid_t h2 = sd.registerHandler<int>(stateful_dispatcher_test_event_B____);
+    ehid_t h3 = sd.registerHandler<int>(stateful_dispatcher_test_event_C____);
+    ehid_t h4 = sd.registerHandler<int>(stateful_dispatcher_test_event_D____);
+    ehid_t h5 = sd.registerHandler<int>(stateful_dispatcher_test_event_E____);
+    ehid_t h6 = sd.registerHandler<int>(stateful_dispatcher_test_event_F____);
+    ehid_t h7 = sd.registerHandler<int>(stateful_dispatcher_test_event_ANY____);
+    sd.setState("1");
+    sd.emitEvent<int>(e1t);
+    sd.emitEvent<int>(e2t);
+    sd.setState("2");
+    sd.emitEvent<int>(e1t);
+    sd.emitEvent<int>(e2t);
+    sd.emitEvent<int>(e1t);
+    sd.emitEvent<int>(e3t);
 }
 

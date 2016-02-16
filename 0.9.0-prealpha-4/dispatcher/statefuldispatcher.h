@@ -37,6 +37,8 @@
 
 #include "dispatcher.h"
 
+const std::string STATE_EVENT_TYPE_PREFIX = "state_";
+
 class StatefulDispatcher
 {
     // I can't quite remember the train of thought I had to suggest it, but
@@ -92,8 +94,8 @@ public:
     // Have to redefine the dispatcher calls, since I'm not subclassing due to
     // the template garbage not letting me virtualize.
 
-    template <class T> ehid_t registerHandler(T& hnd) {
-        return dispatcher_.registerHandler(hnd);
+    template <class T, class A> ehid_t registerHandler(A& hnd) {
+        return dispatcher_.registerHandler<T, A>(hnd);
     }
     int unregisterHandler(ehid_t hnd_id) {
         return dispatcher_.unregisterHandler(hnd_id);
@@ -102,7 +104,8 @@ public:
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
 
-    template <class T> int emitEvent(GameEvent<T>& e, bool);
+    template <class T> int emitEvent(GameEvent<T>& e,
+                                     bool register_if_not_present);
     template <class T> int emitEvent(eid_t e_id,
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
@@ -114,6 +117,8 @@ public:
     // ***********************************
 
     StatefulDispatcher();
+
+    static void test();
 };
 
 // Man, these templates are brutal.
@@ -122,13 +127,14 @@ public:
 
 template <class T>
 eid_t StatefulDispatcher::registerEvent(GameEvent<T> &e,
-                                        bool override)
+                                        bool override = true)
 {
 
 }
 
 template <class T>
-int StatefulDispatcher::emitEvent(GameEvent<T> &e, bool)
+int StatefulDispatcher::emitEvent(GameEvent<T> &e,
+                                  bool register_if_not_present = true)
 {
 
 }
