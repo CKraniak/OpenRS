@@ -23,7 +23,7 @@ void SignalBase::disconnect(ehid_t h_id)
 
 ehid_t Dispatcher::getFirstUnusedHandlerId()
 {
-    ehid_t new_id = 1;
+    ehid_t new_id = FIRST_HANDLER_ID;
     while(handler_list.find(new_id) != handler_list.end()) {
         ++new_id;
     }
@@ -32,7 +32,7 @@ ehid_t Dispatcher::getFirstUnusedHandlerId()
 
 eid_t Dispatcher::getFirstUnusedEventId()
 {
-    eid_t new_id = 1;
+    eid_t new_id = FIRST_EVENT_ID;
     while(event_list.find(new_id) != event_list.end()) {
         ++new_id;
     }

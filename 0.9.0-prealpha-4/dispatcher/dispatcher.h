@@ -69,6 +69,9 @@
 typedef int ehid_t; // Handler ID type
 typedef int eid_t;  // Event ID type
 
+const ehid_t FIRST_HANDLER_ID = 1;
+const eid_t FIRST_EVENT_ID = 1;
+
 // Forward declare for the signal.
 class Dispatcher;
 
@@ -101,6 +104,7 @@ public:
     using force_type = T;
 };
 
+// Note: the caller argument is the sending dispatcher
 template <class T>
 int EventSignal<T>::execSignal(void *caller, T &data)
 {
@@ -138,7 +142,14 @@ class Dispatcher
     // Could also do an event queue
     // Would cast void* to type T, whatever that type is, to enable data passing
     // Well, the event already has data inside of it, so the void* isn't needed
+    //
+    // NEW DESIGN THING: make this a call stack, only use it to prevent
+    // infinite recursion.
     //std::queue<int> event_queue; // Event ID queue
+
+    // The caller is either this or a substitute form of this. It's meant to
+    // give handlers a way to emit events themselves.
+    void * caller_;
 
     ehid_t getFirstUnusedHandlerId();
     eid_t  getFirstUnusedEventId();
@@ -149,6 +160,7 @@ class Dispatcher
     bool isHandlerInList();
 
 public:
+    Dispatcher() : caller_(this) {}
     // Must delete any pointers in the maps
     virtual ~Dispatcher();
 
@@ -170,6 +182,12 @@ public:
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
     template <class T> void setData(int e_id, T data);
+
+    void * setCaller(void * caller = nullptr) {
+        caller_ = (caller == nullptr ? this : caller);
+        return caller_;
+    }
+    void * resetCaller() { return setCaller(); }
 
     static void test();
 
@@ -309,7 +327,7 @@ int Dispatcher::emitEvent(eid_t e_id,
     // --> USED TO throw, switched from 'at' to 'find' so it shouldn't anymore
     if(sig_map.find(e_id) != sig_map.end()) {
         return
-            dynamic_cast<EventSignal<T>*>(sig_map.at(e_id))->execSignal(this,
+            dynamic_cast<EventSignal<T>*>(sig_map.at(e_id))->execSignal(caller_,
                                                                         data);
     }
     return 0;

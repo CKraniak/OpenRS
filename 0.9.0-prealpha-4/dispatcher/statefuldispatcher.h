@@ -33,6 +33,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 #include "dispatcher.h"
 
@@ -69,8 +70,84 @@ class StatefulDispatcher
     // modify the event, regiester it, store the eid_t here, then emit.
     std::map<eid_t, std::map<std::string, eid_t>> e_2_state_e_map_;
 
+    // Events without state information in them
+    std::map<eid_t, std::shared_ptr<EventBase>> stateless_event_list_;
+
+    // Events that do have state information in them
+    std::map<eid_t, std::shared_ptr<EventBase>> stateful_event_list_;
+
+    eid_t getCurrentStateEvent(eid_t e);
+    eid_t makeCurrentStateEvent(eid_t e);
+
+    eid_t getStateEvent(eid_t e, std::string state);
+    eid_t makeStateEvent(eid_t e, std::string state);
+
 public:
+
+    int setState(std::string new_state);
+    std::string getCurrentState() { return state_; }
+
+    // ***********************************
+    //
+    // Have to redefine the dispatcher calls, since I'm not subclassing due to
+    // the template garbage not letting me virtualize.
+
+    template <class T> ehid_t registerHandler(T& hnd) {
+        return dispatcher_.registerHandler(hnd);
+    }
+    int unregisterHandler(ehid_t hnd_id) {
+        return dispatcher_.unregisterHandler(hnd_id);
+    }
+
+    template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
+                       int   unregisterEvent(eid_t e_id);
+
+    template <class T> int emitEvent(GameEvent<T>& e, bool);
+    template <class T> int emitEvent(eid_t e_id,
+                                     typename EventSignal<T>::force_type data);
+    template <class T> int emitEvent(eid_t e_id);
+
+    template <class T> void setData(int e_id, T data) {
+        dispatcher_.setData(getCurrentStateEvent(e_id), data);
+    }
+
+    // ***********************************
+
     StatefulDispatcher();
 };
+
+// Man, these templates are brutal.
+//
+// BROOTUL!!
+
+template <class T>
+eid_t StatefulDispatcher::registerEvent(GameEvent<T> &e,
+                                        bool override)
+{
+
+}
+
+template <class T>
+int StatefulDispatcher::emitEvent(GameEvent<T> &e, bool)
+{
+
+}
+
+template <class T>
+int StatefulDispatcher::emitEvent(eid_t e_id,
+                                  typename EventSignal<T>::force_type data)
+{
+    setData(e_id, data);
+    return emitEvent<T>(e_id);
+}
+
+template <class T>
+int StatefulDispatcher::emitEvent(eid_t e_id)
+{
+    dispatcher_.setCaller(this);
+    int rval = dispatcher_.emitEvent<T>(getCurrentStateEvent(e_id));
+    dispatcher_.resetCaller();
+    return rval;
+}
 
 #endif // STATEFULDISPATCHER_H

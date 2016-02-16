@@ -91,13 +91,6 @@ class Dispatcher;
 // the
 class HandlerBase {
 protected:
-    // When the dispatcher emits an event, the signal will set the handler's
-    // parent to the appropriate dispatcher. This means:
-    //  - the pointer isn't new'd, it's a "this" member of a calling dispatcher
-    //  - it should always be valid inside of a handler's handling function
-    //  - it does not need to be managed or deleted; it's just a way for the
-    //    handler to emit events itself
-    //Dispatcher * parent;
     BooleanCombinationTree bool_tree;
     std::string boolean_string_;
     std::string data_type_name;
@@ -129,13 +122,13 @@ public:
         data_type_name = typeid(T).name();
         is_base = false;
     }
-    GameEventHandler(std::string boolean_string, int (*p)(void *, T)) {
+    GameEventHandler(std::string boolean_string, int (*f)(void *, T)) {
         BooleanCombinationTreeGenerator gen;
         bool_tree = gen.compile(boolean_string);
         data_type_name = typeid(T).name();
         boolean_string_ = boolean_string;
         is_base = false;
-        run_ = p;
+        run_ = f;//orrest, run!
     }
     GameEventHandler(const GameEventHandler & that) {
         this->data_type_name = that.data_type_name;

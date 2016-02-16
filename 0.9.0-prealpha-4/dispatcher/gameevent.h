@@ -45,6 +45,17 @@ public:
     bool operator==(EventBase & that) {
         return (this->name_.compare(that.getName()) == 0);
     }
+
+    int pushType(std::string type) {
+        types_.push_back(type);
+        return types_.size();
+    }
+    std::string popType() {
+        std::string rval = *(types_.rbegin());
+        types_.pop_back();
+        return rval;
+    }
+
     virtual ~EventBase() {}
 
 };
