@@ -15,3 +15,8 @@ bool SystemGroup::connectSystem(CESystem *system) {
     systems_.push_back(std::shared_ptr<CESystem>(system));
     return true;
 }
+
+int SystemGroup::initialize()
+{
+
+}
