@@ -12,15 +12,6 @@
 
 #include "dispatcher.h"
 
-void SignalBase::disconnect(ehid_t h_id)
-{
-    auto it = conn_map.find(h_id);
-    if(it != conn_map.end()) {
-        conn_map[h_id].disconnect();
-        conn_map.erase(it);
-    }
-}
-
 ehid_t Dispatcher::getFirstUnusedHandlerId()
 {
     ehid_t new_id = FIRST_HANDLER_ID;

@@ -129,6 +129,16 @@ template <class T>
 eid_t StatefulDispatcher::registerEvent(GameEvent<T> &e,
                                         bool override = true)
 {
+    for(auto event : stateless_event_list_) {
+        if (e == *event.second.get()) {
+            return event.first;
+        }
+    }
+    for(auto event : stateful_event_list_) {
+        if (e == *event.second.get()) {
+            return event.first;
+        }
+    }
 
 }
 
