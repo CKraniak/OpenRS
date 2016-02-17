@@ -10,54 +10,13 @@
  */
 #include "statefuldispatcher.h"
 
-// Returns FIRST_EVENT_ID - 1 if the event was not registered before calling.
-eid_t StatefulDispatcher::getCurrentStateEvent(eid_t e)
-{
-    return getStateEvent(e, this->state_);
-}
-
-// Returns the eid_t of the event that makeCurrentStateEvent makes
-eid_t StatefulDispatcher::makeCurrentStateEvent(eid_t e)
-{
-    return makeStateEvent(e, this->state_);
-}
-
-eid_t StatefulDispatcher::getStateEvent(eid_t e, std::string state)
-{
-    // Check that the event is registered as a stateless event
-    if(stateless_event_list_.find(e) == stateless_event_list_.end()) {
-        return FIRST_EVENT_ID - 1;
-    }
-
-    auto vec = e_2_state_e_map_.find(e);
-    if(vec == e_2_state_e_map_.end()) {
-        // TODO: Finish making the event / adding it to the map properly.
-        eid_t new_e = makeStateEvent(e, state);
-        vec = e_2_state_e_map_.find(new_e);
-    }
-
-    std::map<std::string, eid_t> statemap = vec->second;
-    auto state_it = statemap.find(state);
-    if(state_it == statemap.end()) {
-        // TODO: Finish making the event / adding it to the map properly.
-        eid_t new_e = makeStateEvent(e, state);
-    }
-    // Only gets down here if the state existed before.
-    return state_it->second;
-}
-
-eid_t StatefulDispatcher::makeStateEvent(eid_t e, std::string state)
-{
-
-}
-
 int StatefulDispatcher::setState(std::string new_state)
 {
     GameEvent<int> leaving("on_leave", {"on_leave"}, 0);
     emitEvent<int>(leaving);
 
     prev_state_ = state_;
-    state_ = STATE_EVENT_TYPE_PREFIX + new_state;
+    state_ = new_state;
 
     GameEvent<int> entering("on_enter", {"on_enter"}, 0);
     emitEvent<int>(entering);
@@ -75,14 +34,35 @@ StatefulDispatcher::StatefulDispatcher()
 
 }
 
-GE_HND(stateful_dispatcher_test_event_A____, int, "s1 AND state_1", { return 0; })
-GE_HND(stateful_dispatcher_test_event_B____, int, "s1 AND state_2", { return 1; })
-GE_HND(stateful_dispatcher_test_event_C____, int, "s2 AND state_1", { return 2; })
-GE_HND(stateful_dispatcher_test_event_D____, int, "s2 AND state_2", { return 3; })
-GE_HND(stateful_dispatcher_test_event_E____, int, "s3 AND state_1", { return 4; })
-GE_HND(stateful_dispatcher_test_event_F____, int, "s3 AND state_2", { return 5; })
+GE_HND(stateful_dispatcher_test_event_A____, int, "s1 AND state_1", {
+           ERR_MSGOUT("s1, s1");
+           return 0;
+       })
+GE_HND(stateful_dispatcher_test_event_B____, int, "s1 AND state_2", {
+           ERR_MSGOUT("s1, s2");
+           return 1;
+       })
+GE_HND(stateful_dispatcher_test_event_C____, int, "s2 AND state_1", {
+           ERR_MSGOUT("s2, s1");
+           return 2;
+       })
+GE_HND(stateful_dispatcher_test_event_D____, int, "s2 AND state_2", {
+           ERR_MSGOUT("s2, s2");
+           return 3;
+       })
+GE_HND(stateful_dispatcher_test_event_E____, int, "s3 AND state_1", {
+           ERR_MSGOUT("s3, s1");
+           return 4;
+       })
+GE_HND(stateful_dispatcher_test_event_F____, int, "s3 AND state_2", {
+           ERR_MSGOUT("s3, s2");
+           return 5;
+       })
 // The following state can run any event that's not of type "none".
-GE_HND(stateful_dispatcher_test_event_ANY____, int, "NOT none", { return 99; })
+GE_HND(stateful_dispatcher_test_event_ANY____, int, "NOT none", {
+           ERR_MSGOUT("sANY");
+           return 99;
+       })
 
 void StatefulDispatcher::test()
 {
@@ -91,6 +71,7 @@ void StatefulDispatcher::test()
     GameEvent<int> e3 = GameEvent<int>("e3", {"s3"}, 0);
     StatefulDispatcher sd;
     eid_t e1t = sd.registerEvent(e1);
+    ERR_MSGOUT(e1.getDebugPrintString().c_str()); // == "e1;s1"
     eid_t e2t = sd.registerEvent(e2);
     eid_t e3t = sd.registerEvent(e3);
     ehid_t h1 = sd.registerHandler<int>(stateful_dispatcher_test_event_A____);

@@ -55,6 +55,17 @@ public:
         types_.pop_back();
         return rval;
     }
+    // w00p, golf that shit
+    std::string getDebugPrintString() {
+        return (name_ + [this]()
+                        {
+                            std::string r;
+                            for(auto s: types_) {
+                                r += ';';
+                                r += s;};
+                            return r;
+                        } ());
+    }
 
     virtual ~EventBase() {}
 

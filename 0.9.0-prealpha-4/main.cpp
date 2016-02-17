@@ -15,20 +15,21 @@
 int openrs_main(int argc, char** argv) {
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
-    StatefulDispatcher sd = StatefulDispatcher();
+//    StatefulDispatcher sd = StatefulDispatcher();
+    StatefulDispatcher::test();
 
     // - TODO: Process command-line args and config file here
 
     // - Start OS-specific code
-    std::unique_ptr<MLInterface> mli = MLInterface::getInterface(&sd);
-    mli.get()->createMainWindow();
-    while ( ! mli.get()->shouldQuit() ) {
-        // main loop:
-        //  - look for input, process if available
-        mli.get()->emptyMessagePump();
-        //  - update
-        //  - render
-    }
+//    std::unique_ptr<MLInterface> mli = MLInterface::getInterface(&sd);
+//    mli.get()->createMainWindow();
+//    while ( ! mli.get()->shouldQuit() ) {
+//        // main loop:
+//        //  - look for input, process if available
+//        mli.get()->emptyMessagePump();
+//        //  - update
+//        //  - render
+//    }
     return 0;
 }
 
