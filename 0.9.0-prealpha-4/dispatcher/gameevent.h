@@ -103,7 +103,15 @@ public:
           data_type_name(typeid(T).name()) {
         name_ = name;
         types_ = types;
-        has_data= true;
+        has_data = true;
+    }
+    GameEvent(std::string name,
+              std::vector<std::string> types):
+          data_(T()),
+          data_type_name(typeid(T).name()) {
+        name_ = name;
+        types_ = types;
+        has_data = false;
     }
 
     T                        getData()  const { return data_; }

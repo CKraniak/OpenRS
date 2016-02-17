@@ -59,6 +59,7 @@
 
 #include <string>
 #include <queue>
+#include <type_traits>
 
 #include "../utility.h"
 #include "gameevent.h"
@@ -124,8 +125,8 @@ public:
                        // "same" events to exist.
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
-    template <class T> int emitEvent(GameEvent<T>& e,
-                                     bool register_if_not_present);
+    template <class T, class A> int emitEvent(GameEvent<T>& e,
+                                              A register_if_not_present);
     template <class T> int emitEvent(eid_t e_id,
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
@@ -225,9 +226,11 @@ eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
 }
 
 // Note: register_if_not_present both sregister AND de-registers
-template <class T>
+template <class T, class A>
 int Dispatcher::emitEvent(GameEvent<T>& e,
-                          bool register_if_not_present = true) {
+                          A register_if_not_present = true) {
+    static_assert(std::is_same<A, bool>::value,
+                  "emitEvent(GameEvent<T>&, bool) called with non-bool");
     // Check registration status.
     eid_t eid = getEventId(e);
     bool do_register = false;

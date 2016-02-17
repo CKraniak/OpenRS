@@ -82,6 +82,7 @@ void StatefulDispatcher::test()
     ehid_t h6 = sd.registerHandler<int>(stateful_dispatcher_test_event_F____);
     ehid_t h7 = sd.registerHandler<int>(stateful_dispatcher_test_event_ANY____);
     sd.setState("1");
+    ERR_MSGOUT(e1.getDebugPrintString().c_str()); // == "e1;s1"
     sd.emitEvent<int>(e1t);
     sd.emitEvent<int>(e2t);
     sd.setState("2");

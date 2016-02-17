@@ -16,7 +16,7 @@ int openrs_main(int argc, char** argv) {
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
 //    StatefulDispatcher sd = StatefulDispatcher();
-    StatefulDispatcher::test();
+    Dispatcher::test();
 
     // - TODO: Process command-line args and config file here
 

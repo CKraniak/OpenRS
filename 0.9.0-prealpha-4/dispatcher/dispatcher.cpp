@@ -95,7 +95,7 @@ int Dispatcher::unregisterEvent(eid_t e_id)
 GE_HND(test_handler_1, int, "test_1", {
            Dispatcher * parent_disp = static_cast<Dispatcher *>(parent);
            GameEvent<int> e("sub-event", {"sub_event"}, input);
-           parent_disp->emitEvent(e);
+           parent_disp->emitEvent(e, true);
            return input;
 })
 
@@ -175,13 +175,71 @@ GE_HND(test_handler_1, int, "test_1", {
 // is complete, since it will rethrow a bunch. So the queue is not needed yet,
 // if ever.
 
+
+GE_HND(dispatcher_test_event_A____, int, "s1", {
+//           ERR_MSGOUT(std::string("s1, s1: " + std::to_string(input)).c_str());
+           return 0;
+       })
+GE_HND(dispatcher_test_event_B____, int, "s1", {
+           ERR_MSGOUT("s1, s2");
+           return 1;
+       })
+GE_HND(dispatcher_test_event_C____, int, "s2", {
+           ERR_MSGOUT("s2, s1");
+           return 2;
+       })
+GE_HND(dispatcher_test_event_D____, int, "s2", {
+           ERR_MSGOUT("s2, s2");
+           return 3;
+       })
+GE_HND(dispatcher_test_event_E____, int, "s3", {
+           ERR_MSGOUT("s3, s1");
+           return 4;
+       })
+GE_HND(dispatcher_test_event_F____, int, "s3", {
+           ERR_MSGOUT("s3, s2");
+           return 5;
+       })
+// The following state can run any event that's not of type "none".
+GE_HND(dispatcher_test_event_ANY____, int, "NOT none", {
+           ERR_MSGOUT("sANY");
+           return 99;
+       })
+
 void Dispatcher::test()
+{
+    // Test 1.1: no data, no registration of event, calls handler ok
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        sd.registerHandler<int>(dispatcher_test_event_A____);
+        sd.emitEvent(e1, true);
+    } while (0);
+    // Test 1.2: same as 1.1, except register event and emit with no data
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        eid_t eid = sd.registerEvent(e1);
+        sd.registerHandler<int>(dispatcher_test_event_A____);
+        sd.emitEvent<int>(eid);
+    } while (0);
+    // Test 1.3: same as 1.2, except emit with data (int)
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        eid_t eid = sd.registerEvent(e1);
+        sd.registerHandler<int>(dispatcher_test_event_A____);
+        sd.emitEvent<int>(eid);
+    } while (0);
+    return;
+}
+/* void Dispatcher::test()
 {
     // TEST CASES:
     // 1 single dispatcher, single event, single handler
-    //   1.1  no data, no registration of event, calls handler ok
-    //   1.2  same as 1.1, except register event and emit with no data
-    //   1.3  same as 1.2, except emit with data (int)
+    //   1.1
+    //   1.2
+    //   1.3
     //   1.4  1.3 with char
     //   1.5  1.3 with void *
     //   1.6  1.3 with class &
@@ -192,7 +250,7 @@ void Dispatcher::test()
     //   1.11 1.10 after the handler was deleted once
     //   1.12 loop a handler register/delete 1000x+, see if it becomes unstable
     //   1.13 1.12, but register/delete an event instead
-    //   1.14
+    //   1.14 test with multiple data types (int, char, and class)
     // 2 single dispatcher, 3 events, 7 handlers, map:
     //        E1 -> (H1, H2, H3), E2->(H4, H5, H6), E3->(H1, H4, H5, H7)
     //   2.1  register all, different data in E1-3, make sure basic emit works
@@ -208,3 +266,4 @@ void Dispatcher::test()
     //   3.4  delete H4 from E2, run from all dispatchers
     //   3.5  delete D2, check all run as expected
 }
+*/
