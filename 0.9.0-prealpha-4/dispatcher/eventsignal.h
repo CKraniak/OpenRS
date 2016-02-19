@@ -56,7 +56,12 @@ void EventSignal<T>::connect(GameEventHandler<T> hnd, ehid_t h_id)
 template <class T>
 int EventSignal<T>::operator()(void * caller, T& data)
 {
-    return *sig(caller, data);
+    if (! sig.empty()) {
+        return *sig(caller, data);
+    }
+    else {
+        return 0;
+    }
 }
 
 #endif // EVENTSIGNAL_H
