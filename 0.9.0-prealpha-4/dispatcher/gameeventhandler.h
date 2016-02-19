@@ -50,6 +50,7 @@
 
 #include <map>
 #include <typeinfo>
+#include <type_traits>
 
 #include "gameevent.h"
 #include "booleancombinationtree.h"
@@ -77,7 +78,7 @@ class hc_##NAME : public GameEventHandler<TYPE> {                              \
 public:                                                                   \
     hc_##NAME(std::string s) : GameEventHandler<TYPE>(s,                       \
                                                      [](void * parent, \
-                                                        TYPE input) DEF ) { \
+                                                        TYPE input) -> int DEF ) { \
 }  \
 }; hc_##NAME NAME(MATCH);
 
@@ -119,10 +120,12 @@ template <class T> class GameEventHandler : public HandlerBase
 {
 public:
     GameEventHandler() {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         data_type_name = typeid(T).name();
         is_base = false;
     }
     GameEventHandler(std::string boolean_string, int (*f)(void *, T)) {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         BooleanCombinationTreeGenerator gen;
         bool_tree = gen.compile(boolean_string);
         data_type_name = typeid(T).name();
@@ -131,6 +134,7 @@ public:
         run_ = f;//orrest, run!
     }
     GameEventHandler(const GameEventHandler & that) {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         this->data_type_name = that.data_type_name;
         this->is_base = false; // kind of automatic if you're in this function
         this->boolean_string_ = that.boolean_string_;

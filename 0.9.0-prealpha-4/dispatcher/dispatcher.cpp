@@ -99,6 +99,7 @@ GE_HND(test_handler_1, int, "test_1", {
            return input;
 })
 
+namespace comment_collapser__ {
 // So how would our numkey event propogation look between systems?
 //
 // Press numpad 7:
@@ -174,11 +175,38 @@ GE_HND(test_handler_1, int, "test_1", {
 // It means I need to implement a Dispatcher that doesn't block until an event
 // is complete, since it will rethrow a bunch. So the queue is not needed yet,
 // if ever.
+}
 
+class dtest_class__ {
+    int x_;
+
+public:
+    dtest_class__() : x_(0) {}
+    dtest_class__(int x) : x_(x) {}
+    void setX(int x) { x_ = x; }
+    int getX() { return x_; }
+};
+
+GE_HND(dispatcher_test_event_A_char____, char, "s1", {
+           ERR_MSGOUT(std::string("s1, s1 (char): " + std::to_string(input)).c_str());
+           return input;
+       })
+
+GE_HND(dispatcher_test_event_A_vp____, void*, "s1", {
+           int (*f)(void) = (int (*)(void)) input;
+           ERR_MSGOUT(std::string("s1, s1 (void*): " + std::to_string(f())).c_str());
+           return f();
+       })
+
+GE_HND(dispatcher_test_event_A_class____, dtest_class__*, "s1", {
+           ERR_MSGOUT(std::string("s1, s1 (class&): " + std::to_string(input->getX())).c_str());
+           input->setX(5);
+           return 1;
+       })
 
 GE_HND(dispatcher_test_event_A____, int, "s1", {
-//           ERR_MSGOUT(std::string("s1, s1: " + std::to_string(input)).c_str());
-           return 0;
+           ERR_MSGOUT(std::string("s1, s1 (int): " + std::to_string(input)).c_str());
+           return input;
        })
 GE_HND(dispatcher_test_event_B____, int, "s1", {
            ERR_MSGOUT("s1, s2");
@@ -213,7 +241,7 @@ void Dispatcher::test()
         Dispatcher sd;
         GameEvent<int> e1("e1", {"s1"});
         sd.registerHandler<int>(dispatcher_test_event_A____);
-        sd.emitEvent(e1, true);
+        assert(sd.emitEvent(e1, true) == int());
     } while (0);
     // Test 1.2: same as 1.1, except register event and emit with no data
     do {
@@ -221,7 +249,7 @@ void Dispatcher::test()
         GameEvent<int> e1("e1", {"s1"});
         eid_t eid = sd.registerEvent(e1);
         sd.registerHandler<int>(dispatcher_test_event_A____);
-        sd.emitEvent<int>(eid);
+        assert(sd.emitEvent<int>(eid) == int());
     } while (0);
     // Test 1.3: same as 1.2, except emit with data (int)
     do {
@@ -229,24 +257,74 @@ void Dispatcher::test()
         GameEvent<int> e1("e1", {"s1"});
         eid_t eid = sd.registerEvent(e1);
         sd.registerHandler<int>(dispatcher_test_event_A____);
-        sd.emitEvent<int>(eid);
+        assert(sd.emitEvent<int>(eid, 5) == 5);
     } while (0);
+    // Test 1.4: 1.3 with char
+    do {
+        Dispatcher sd;
+        GameEvent<char> e1("e1", {"s1"});
+        eid_t eid = sd.registerEvent(e1);
+        sd.registerHandler<char>(dispatcher_test_event_A_char____);
+        assert(sd.emitEvent<char>(eid, 5) == 5);
+    } while (0);
+    // Test 1.5: 1.3 with void *
+    do {
+        Dispatcher sd;
+        GameEvent<void *> e1("e1", {"s1"});
+        int (*pf)(void) = []() { return 3; };
+        void * x = (void *)pf;
+        eid_t eid = sd.registerEvent(e1);
+        sd.registerHandler<void *>(dispatcher_test_event_A_vp____);
+        assert(sd.emitEvent<void *>(eid, x) == 3);
+    } while (0);
+    // Test 1.6 & 1.7: 1.3 with class* and modifying a member variable
+    do {
+        Dispatcher sd;
+        dtest_class__ dt(7);
+        GameEvent<dtest_class__*> e1("e1", {"s1"}, &dt);
+        eid_t eid = sd.registerEvent(e1);
+        sd.registerHandler<dtest_class__*>(dispatcher_test_event_A_class____);
+        assert(sd.emitEvent<dtest_class__*>(eid) == 1);
+        assert(dt.getX() == 5);
+    } while (0);
+    // Test 1.8: unregister handler, emit event, no segfaults
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        ehid_t h = sd.registerHandler<int>(dispatcher_test_event_A____);
+        assert(sd.emitEvent(e1, true) == int());
+        sd.unregisterHandler(h);
+        assert(sd.emitEvent(e1, true) == 0);
+    } while (0);
+    // Test 1.9: re-register handler, test with data
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        ehid_t h = sd.registerHandler<int>(dispatcher_test_event_A____);
+        assert(sd.emitEvent(e1, true) == int());
+        sd.unregisterHandler(h);
+        assert(sd.emitEvent(e1, true) == 0);
+        h = sd.registerHandler<int>(dispatcher_test_event_A____);
+        e1.setData(1234);
+        assert(sd.emitEvent<int>(e1, true) == 1234);
+    } while (0);
+    // Test 1.10: double register event, test that registration only happens once
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        ehid_t h = sd.registerHandler<int>(dispatcher_test_event_A____);
+        eid_t e1i  = sd.registerEvent(e1);
+        assert(sd.emitEvent<int>(e1i) == int());
+        eid_t e1i2 = sd.registerEvent(e1);
+        assert(e1i == e1i2);
+    } while (0);
+    ERR_MSGOUT("Dispatcher::test(): All tests passed");
     return;
 }
 /* void Dispatcher::test()
 {
     // TEST CASES:
     // 1 single dispatcher, single event, single handler
-    //   1.1
-    //   1.2
-    //   1.3
-    //   1.4  1.3 with char
-    //   1.5  1.3 with void *
-    //   1.6  1.3 with class &
-    //   1.7  1.6 modifying class member and getting it to stick
-    //   1.8  delete handler, emit event, no segfaults
-    //   1.9  re-register event, test with data
-    //   1.10 double register event, test that registration only happens once
     //   1.11 1.10 after the handler was deleted once
     //   1.12 loop a handler register/delete 1000x+, see if it becomes unstable
     //   1.13 1.12, but register/delete an event instead
