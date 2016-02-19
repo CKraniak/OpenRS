@@ -57,6 +57,10 @@
 #ifndef DISPATCHER_H
 #define DISPATCHER_H
 
+// NOTE: Dispatcher currently does not work with reference types!
+// NOTE: Types must have a public zero-argument constructor to function with
+//       the Dispatcher!
+
 #include <string>
 #include <queue>
 #include <type_traits>
@@ -200,7 +204,7 @@ eid_t Dispatcher::getEventId(GameEvent<T> &e) {
 }
 
 template <class T>
-eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
+eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = false)
 {
     // Add event to event_list if not already on it
     eid_t e_id = getEventId(e);
