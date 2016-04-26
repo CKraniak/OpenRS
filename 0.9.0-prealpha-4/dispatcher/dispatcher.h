@@ -108,11 +108,12 @@ class Dispatcher
 
     bool isHandlerInList(); // I forgot what I was doing with this ...
 
-    // If I need to debog events, a function like this may come in handy
+    // If I need to debug events, a function like this may come in handy
     //void printEventsToFile();
 
 public:
-    Dispatcher() : caller_(this) {}
+    Dispatcher() : caller_(this) {} // Technically illegal, I think. Works on
+                                    // my machine, so not changing it.
     // Must delete any pointers in the maps
     virtual ~Dispatcher();
 
@@ -134,7 +135,16 @@ public:
     template <class T> int emitEvent(eid_t e_id,
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
-    template <class T> void setData(int e_id, T data);
+    template <class T> void setData(eid_t e_id, T data) {
+        if(event_list.find(e_id) == event_list.end()) {
+            return;
+        }
+        dynamic_cast< GameEvent<T> * >(event_list[e_id])->setData(data);
+    }
+    template <class T> T getData(eid_t e_id) {
+        return (event_list.find(e_id) == event_list.end() ? T() :
+            dynamic_cast< GameEvent<T> * >(event_list[e_id])->getData());
+    }
 
     void * setCaller(void * caller = nullptr) {
         caller_ = (caller == nullptr ? this : caller);

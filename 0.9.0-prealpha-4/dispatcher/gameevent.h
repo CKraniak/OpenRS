@@ -48,10 +48,12 @@ public:
 
     int pushType(std::string type) {
         types_.push_back(type);
+        name_ += "_" + type;
         return types_.size();
     }
     std::string popType() {
         std::string rval = *(types_.rbegin());
+        // TODO: remove part of name added due to a push
         types_.pop_back();
         return rval;
     }

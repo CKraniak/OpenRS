@@ -20,10 +20,17 @@ do {                                                            \
     MessageBox(NULL, msg, "Error", MB_OK | MB_ICONERROR);       \
 } while (0)
 
+#define INFO_MSGOUT(msg)                                        \
+do {                                                            \
+    MessageBox(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);  \
+} while (0)
+
 #ifdef DEBUG
-#define ERR_MSGOUT_DEBUG(x) ERR_MSGOUT(x)
+#define ERR_MSGOUT_DEBUG(x)  ERR_MSGOUT(x)
+#define INFO_MSGOUT_DEBUG(x) INFO_MSGOUT(x)
 #else
 #define ERR_MSGOUT_DEBUG(x)
+#define INFO_MSGOUT_DEBUG(x)
 #endif
 
 // The buffer is arbitrarily sized.

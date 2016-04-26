@@ -34,6 +34,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <type_traits>
 
 #include "dispatcher.h"
 
@@ -91,6 +92,8 @@ public:
 
     int setState(std::string new_state);
     std::string getCurrentState() { return state_; }
+    std::string getCurrentStatePrefix() { return STATE_EVENT_TYPE_PREFIX +
+                                                 state_;                    }
 
     // ***********************************
     //
@@ -107,15 +110,25 @@ public:
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
 
-    template <class T> int emitEvent(GameEvent<T>& e,
-                                     bool register_if_not_present);
-    template <class T> int emitEvent(eid_t e_id,
-                                     typename EventSignal<T>::force_type data);
-    template <class T> int emitEvent(eid_t e_id);
+    template <class data_type, class bool_type>
+                               int emitEvent(GameEvent<data_type>& e,
+                                             bool_type register_if_not_present);
+    template <class data_type> int emitEvent(eid_t e_id,
+                                             typename EventSignal<data_type>::force_type data);
+    template <class data_type> int emitEvent(eid_t e_id);
 
-    template <class T> void setData(int e_id, T data) {
-        dispatcher_.setData(getCurrentStateEventID<T>(e_id), data);
+    template <class T> void setData(eid_t e_id, T data) {
+        // This should not trigger a stateful event creation; all event data
+        // should be stored in stateless until an event is fired, at which point
+        // the data will be copied over
+        dispatcher_.setData<T>(e_id, data);
     }
+
+    template <class T> T getData(eid_t e_id) {
+       return dispatcher_.getData<T>(e_id);
+    }
+
+    std::string getStateString() { return STATE_EVENT_TYPE_PREFIX + state_; }
 
     // ***********************************
 
@@ -129,11 +142,12 @@ public:
 // BROOTUL!!
 
 
-// Returns FIRST_EVENT_ID - 1 if the event was not registered before calling.
-template <class T>
+// Returns FIRST_EVENT_ID - 1 if the (stateless) event was not registered
+// before calling.
+template <class data_type>
 eid_t StatefulDispatcher::getCurrentStateEventID(eid_t e)
 {
-    return getStateEvent<T>(e, this->state_);
+    return getStateEvent<data_type>(e, this->state_);
 }
 
 // e = stateless event ID
@@ -155,13 +169,17 @@ eid_t StatefulDispatcher::getStateEvent(eid_t e, std::string state)
         // TODO: Finish making the event / adding it to the map properly.
         eid_t new_e = makeStateEvent<T>(e, state);
         vec = e_2_state_e_map_.find(new_e);
+        if(vec == e_2_state_e_map_.end()) {
+            ERR_MSGOUT("failed to register stateful event version of event");
+            return FIRST_EVENT_ID - 1;
+        }
     }
 
     std::map<std::string, eid_t> statemap = vec->second;
     auto state_it = statemap.find(state);
     if(state_it == statemap.end()) {
         // TODO: Finish making the event / adding it to the map properly.
-        eid_t new_e = makeStateEvent<T>(e, state);
+        return makeStateEvent<T>(e, state);
     }
     // Only gets down here if the state existed before.
     return state_it->second;
@@ -178,7 +196,7 @@ eid_t StatefulDispatcher::makeCurrentStateEvent(eid_t e)
 template <class T>
 eid_t StatefulDispatcher::makeStateEvent(eid_t e, std::string state)
 {
-    if(state.compare("") == 0) {
+    if(state.size() == 0) {
         return FIRST_EVENT_ID - 1;
     }
     auto elist_elem = stateless_event_list_.find(e);
@@ -186,19 +204,22 @@ eid_t StatefulDispatcher::makeStateEvent(eid_t e, std::string state)
         ERR_MSGOUT("event not in list");
         return FIRST_EVENT_ID - 1;
     }
-    GameEvent<T> *e_ptr = dynamic_cast<GameEvent<T>*>(elist_elem->second.get());
-    e_ptr->pushType(std::string(STATE_EVENT_TYPE_PREFIX) + state);
+    GameEvent<T> e_st = GameEvent<T>(*dynamic_cast<GameEvent<T>*>(elist_elem->second.get()));
+    e_st.pushType(std::string(STATE_EVENT_TYPE_PREFIX) + state);
     // TODO: better checking of end() iterators and return values
-    eid_t state_eid = dispatcher_.registerEvent(*e_ptr);
+    eid_t state_eid = dispatcher_.registerEvent(e_st);
     e_2_state_e_map_[e][state] = state_eid;
-    return dispatcher_.registerEvent(*e_ptr);
+    stateful_event_list_[state_eid] = std::shared_ptr<GameEvent<T>>(new GameEvent<T>(e_st));
+    return dispatcher_.registerEvent(e_st);
 }
 
 // Add event to the stateless event list and give it an empty state event map
-template <class T>
-eid_t StatefulDispatcher::registerEvent(GameEvent<T> &e,
+template <class data_type>
+eid_t StatefulDispatcher::registerEvent(GameEvent<data_type> &e,
                                         bool override = true)
 {
+    // Make sure it's an unknown state; check against both stateful and
+    // stateless lists
     for(auto event : stateless_event_list_) {
         if (e == *event.second.get()) {
             return event.first;
@@ -210,22 +231,29 @@ eid_t StatefulDispatcher::registerEvent(GameEvent<T> &e,
         }
     }
     eid_t e_id = dispatcher_.registerEvent(e, override);
-    stateless_event_list_[e_id] = std::shared_ptr<EventBase>(new GameEvent<T>(e));
+    // Put unknown event in stateless event list
+    stateless_event_list_[e_id] =
+            std::shared_ptr<EventBase>(new GameEvent<data_type>(e));
+    // Make a new s2e_map, since this is a new event and should not already
+    // have one
     e_2_state_e_map_[e_id] = state_to_event_map();
     // return makeCurrentStateEvent<T>(e_id); // why did I do it this way?
-    // The caller should never need to care about any state information
+    // The caller should never need to care about any state information, so
+    // we return the stateless ID.
     return e_id;
 }
 
-template <class T>
-int StatefulDispatcher::emitEvent(GameEvent<T> &e,
-                                  bool register_if_not_present = true)
+template <class data_type, class bool_type>
+int StatefulDispatcher::emitEvent(GameEvent<data_type> &e,
+                                  bool_type register_if_not_present = true)
 {
+    static_assert(std::is_same<bool_type, bool>::value,
+                  "emitEvent(GameEvent<data_type>&, bool) called with non-bool");
     if(state_.size() != 0) {
         e.pushType(std::string(STATE_EVENT_TYPE_PREFIX) + state_);
     }
     dispatcher_.setCaller(this);
-    int rval = dispatcher_.emitEvent<T>(e, register_if_not_present);
+    int rval = dispatcher_.emitEvent<data_type>(e, register_if_not_present);
     dispatcher_.resetCaller();
     if(state_.size() != 0) {
         e.popType();
@@ -233,19 +261,24 @@ int StatefulDispatcher::emitEvent(GameEvent<T> &e,
     return rval;
 }
 
-template <class T>
+template <class data_type>
 int StatefulDispatcher::emitEvent(eid_t e_id,
-                                  typename EventSignal<T>::force_type data)
+                                  typename EventSignal<data_type>::force_type data)
 {
     setData(e_id, data);
-    return emitEvent<T>(e_id);
+    return emitEvent<data_type>(e_id);
 }
 
-template <class T>
+template <class data_type>
 int StatefulDispatcher::emitEvent(eid_t e_id)
 {
+    // Get stateful event, make if it doesn't exist
+    eid_t stateful_eid = getCurrentStateEventID<data_type>(e_id);
+    // Copy data
+    dispatcher_.setData<data_type>(stateful_eid, dispatcher_.getData<data_type>(e_id));
+    // Run event
     dispatcher_.setCaller(this);
-    int rval = dispatcher_.emitEvent<T>(getCurrentStateEventID<T>(e_id));
+    int rval = dispatcher_.emitEvent<data_type>(stateful_eid);
     dispatcher_.resetCaller();
     return rval;
 }

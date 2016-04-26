@@ -187,46 +187,51 @@ public:
     int getX() { return x_; }
 };
 
+//        E1 -> (H1, H2, H3), E2->(H4, H5, H6), E3->(H1, H4, H5, H7)
 GE_HND(dispatcher_test_event_A_char____, char, "s1", {
-           ERR_MSGOUT(std::string("s1, s1 (char): " + std::to_string(input)).c_str());
+           ERR_MSGOUT(std::string("Ac: s1, s1 (char): " + std::to_string(input)).c_str());
            return input;
        })
 
 GE_HND(dispatcher_test_event_A_vp____, void*, "s1", {
            int (*f)(void) = (int (*)(void)) input;
-           ERR_MSGOUT(std::string("s1, s1 (void*): " + std::to_string(f())).c_str());
+           ERR_MSGOUT(std::string("Av: s1, s1 (void*): " + std::to_string(f())).c_str());
            return f();
        })
 
 GE_HND(dispatcher_test_event_A_class____, dtest_class__*, "s1", {
-           ERR_MSGOUT(std::string("s1, s1 (class&): " + std::to_string(input->getX())).c_str());
+           ERR_MSGOUT(std::string("ACl: s1, s1 (class&): " + std::to_string(input->getX())).c_str());
            input->setX(5);
            return 1;
        })
 
-GE_HND(dispatcher_test_event_A____, int, "s1", {
-           ERR_MSGOUT(std::string("s1, s1 (int): " + std::to_string(input)).c_str());
+GE_HND(dispatcher_test_event_A____, int, "s1 OR s3", {
+           ERR_MSGOUT(std::string("A: s1, s1 (int): " + std::to_string(input)).c_str());
            return input;
        })
 GE_HND(dispatcher_test_event_B____, int, "s1", {
-           ERR_MSGOUT("s1, s2");
+           ERR_MSGOUT("B: s1, s2");
            return 1;
        })
-GE_HND(dispatcher_test_event_C____, int, "s2", {
-           ERR_MSGOUT("s2, s1");
+GE_HND(dispatcher_test_event_C____, int, "s1", {
+           ERR_MSGOUT("C: s1, s3");
            return 2;
        })
-GE_HND(dispatcher_test_event_D____, int, "s2", {
-           ERR_MSGOUT("s2, s2");
+GE_HND(dispatcher_test_event_D____, int, "s2 OR s3", {
+           ERR_MSGOUT("D: s2, s4");
            return 3;
        })
-GE_HND(dispatcher_test_event_E____, int, "s3", {
-           ERR_MSGOUT("s3, s1");
+GE_HND(dispatcher_test_event_E____, int, "s2 OR s3", {
+           ERR_MSGOUT("E: s2, s5");
            return 4;
        })
-GE_HND(dispatcher_test_event_F____, int, "s3", {
-           ERR_MSGOUT("s3, s2");
+GE_HND(dispatcher_test_event_F____, int, "s2", {
+           ERR_MSGOUT("F: s2, s6");
            return 5;
+       })
+GE_HND(dispatcher_test_event_G____, int, "s3", {
+           ERR_MSGOUT("G: s3, s7");
+           return 6;
        })
 // The following state can run any event that's not of type "none".
 GE_HND(dispatcher_test_event_ANY____, int, "NOT none", {
@@ -318,23 +323,89 @@ void Dispatcher::test()
         eid_t e1i2 = sd.registerEvent(e1);
         assert(e1i == e1i2);
     } while (0);
+    // Test 1.11: 1.10 after the handler was deleted once
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        ehid_t h = sd.registerHandler<int>(dispatcher_test_event_A____);
+        eid_t e1i  = sd.registerEvent(e1);
+        assert(sd.emitEvent<int>(e1i) == int());
+        sd.unregisterHandler(h);
+        eid_t e1i2 = sd.registerEvent(e1);
+        assert(e1i == e1i2);
+    } while (0);
+    // Test 1.12: loop a handler register/delete 1000x+, see if it becomes unstable
+    do {
+        Dispatcher sd;
+        for(int i = 0; i < 50000; i++) {
+            ehid_t h = sd.registerHandler<int>(dispatcher_test_event_A____);
+            sd.unregisterHandler(h);
+        }
+    } while (0);
+    // Test 1.13: 1.12, but register/delete an event instead
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1("e1", {"s1"});
+        for(int i = 0; i < 50000; i++) {
+            eid_t e1i  = sd.registerEvent(e1);
+            sd.unregisterEvent(e1i);
+        }
+    } while (0);
+    // Test 1.14: test with multiple data types (int, char, and class)
+    do {
+        Dispatcher sd;
+        GameEvent<int> e1i("e1i", {"s1"});
+        GameEvent<char> e1c("e1c", {"s1"});
+        int (*ip)(void) = []()->int{return 3;};
+        GameEvent<void *> e1vp("e1vp", {"s1"}, (void *)(ip));
+        sd.registerHandler<int>(dispatcher_test_event_A____);
+        sd.registerHandler<char>(dispatcher_test_event_A_char____);
+        sd.registerHandler<void *>(dispatcher_test_event_A_vp____);
+        sd.registerHandler<int>(dispatcher_test_event_B____);
+        assert(sd.emitEvent(e1i, true) == 1);
+        assert(sd.emitEvent(e1vp, true) == 3);
+    } while (0);
+    // Test 2: single dispatcher, 3 events, 7 handlers, map:
+    //        E1 -> (H1, H2, H3), E2->(H4, H5, H6), E3->(H1, H4, H5, H7)
+    do {
+        // 2.1  register all, different data in E1-3, make sure basic emit works
+        Dispatcher sd;
+        GameEvent<int> e1i("e1i", {"s1"}, 3);
+        GameEvent<int> e2i("e2i", {"s2"}, 5);
+        GameEvent<int> e3i("e3i", {"s3"}, 7);
+        eid_t e1 = sd.registerEvent(e1i);
+        eid_t e2 = sd.registerEvent(e2i);
+        eid_t e3 = sd.registerEvent(e3i);
+        ehid_t h1 = sd.registerHandler<int>(dispatcher_test_event_A____);
+        ehid_t h2 = sd.registerHandler<int>(dispatcher_test_event_B____);
+        ehid_t h3 = sd.registerHandler<int>(dispatcher_test_event_C____);
+        ehid_t h4 = sd.registerHandler<int>(dispatcher_test_event_D____);
+        ehid_t h5 = sd.registerHandler<int>(dispatcher_test_event_E____);
+        ehid_t h6 = sd.registerHandler<int>(dispatcher_test_event_F____);
+        ehid_t h7 = sd.registerHandler<int>(dispatcher_test_event_G____);
+        sd.emitEvent<int>(e1);
+        sd.emitEvent<int>(e2);
+        sd.emitEvent<int>(e3);
+        // 2.2  delete H4, see it deleted in E2 and E3
+        sd.unregisterHandler(h4);
+        sd.emitEvent<int>(e2);
+        sd.emitEvent<int>(e3);
+        // 2.3  remap H3 from E1 to E3 (exclusive, for all future cases), test
+        hc_dispatcher_test_event_C____ ehD_h3("s3");
+        sd.unregisterHandler(h3);
+        h3 = sd.registerHandler<int>(ehD_h3);
+        sd.emitEvent<int>(e1);
+        sd.emitEvent<int>(e3);
+        // 2.4  delete E2, test to make sure H4 and H5 still ok in E3
+        sd.unregisterEvent(e2);
+        sd.emitEvent<int>(e3);
+    } while (0);
     ERR_MSGOUT("Dispatcher::test(): All tests passed");
     return;
 }
 /* void Dispatcher::test()
 {
     // TEST CASES:
-    // 1 single dispatcher, single event, single handler
-    //   1.11 1.10 after the handler was deleted once
-    //   1.12 loop a handler register/delete 1000x+, see if it becomes unstable
-    //   1.13 1.12, but register/delete an event instead
-    //   1.14 test with multiple data types (int, char, and class)
-    // 2 single dispatcher, 3 events, 7 handlers, map:
-    //        E1 -> (H1, H2, H3), E2->(H4, H5, H6), E3->(H1, H4, H5, H7)
-    //   2.1  register all, different data in E1-3, make sure basic emit works
-    //   2.2  delete H4, see it deleted in E2 and E3
-    //   2.3  remap H3 from E1 to E3 (exclusive, for all future cases), test
-    //   2.4  delete E2, test to make sure H4 and H5 still ok in E3
     // 3 3 dispatchers, 3 events, 5 handlers, map:
     //        D1->(E1, E2), D2->(E1, E2, E3), D3->(E1)
     //        E1->(H1, H2, H3), E2->(H1, H4), E3->(H1, H2, H4, H5)
