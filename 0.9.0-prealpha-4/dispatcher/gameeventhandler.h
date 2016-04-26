@@ -50,6 +50,7 @@
 
 #include <map>
 #include <typeinfo>
+#include <type_traits>
 
 #include "gameevent.h"
 #include "booleancombinationtree.h"
@@ -77,7 +78,7 @@ class hc_##NAME : public GameEventHandler<TYPE> {                              \
 public:                                                                   \
     hc_##NAME(std::string s) : GameEventHandler<TYPE>(s,                       \
                                                      [](void * parent, \
-                                                        TYPE input) DEF ) { \
+                                                        TYPE input) -> int DEF ) { \
 }  \
 }; hc_##NAME NAME(MATCH);
 
@@ -91,13 +92,6 @@ class Dispatcher;
 // the
 class HandlerBase {
 protected:
-    // When the dispatcher emits an event, the signal will set the handler's
-    // parent to the appropriate dispatcher. This means:
-    //  - the pointer isn't new'd, it's a "this" member of a calling dispatcher
-    //  - it should always be valid inside of a handler's handling function
-    //  - it does not need to be managed or deleted; it's just a way for the
-    //    handler to emit events itself
-    //Dispatcher * parent;
     BooleanCombinationTree bool_tree;
     std::string boolean_string_;
     std::string data_type_name;
@@ -126,18 +120,21 @@ template <class T> class GameEventHandler : public HandlerBase
 {
 public:
     GameEventHandler() {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         data_type_name = typeid(T).name();
         is_base = false;
     }
-    GameEventHandler(std::string boolean_string, int (*p)(void *, T)) {
+    GameEventHandler(std::string boolean_string, int (*f)(void *, T)) {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         BooleanCombinationTreeGenerator gen;
         bool_tree = gen.compile(boolean_string);
         data_type_name = typeid(T).name();
         boolean_string_ = boolean_string;
         is_base = false;
-        run_ = p;
+        run_ = f;//orrest, run!
     }
     GameEventHandler(const GameEventHandler & that) {
+        static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         this->data_type_name = that.data_type_name;
         this->is_base = false; // kind of automatic if you're in this function
         this->boolean_string_ = that.boolean_string_;

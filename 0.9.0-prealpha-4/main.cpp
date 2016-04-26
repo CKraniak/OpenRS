@@ -17,7 +17,8 @@
 int openrs_main(int argc, char** argv) {
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
-    StatefulDispatcher sd = StatefulDispatcher();
+//    StatefulDispatcher sd = StatefulDispatcher();
+    Dispatcher::test();
 
     SystemGroup systems(&sd);
 

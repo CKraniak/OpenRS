@@ -57,70 +57,21 @@
 #ifndef DISPATCHER_H
 #define DISPATCHER_H
 
+// NOTE: Dispatcher currently does not work with reference types!
+// NOTE: Types must have a public zero-argument constructor to function with
+//       the Dispatcher!
+
 #include <string>
 #include <queue>
+#include <type_traits>
 
 #include "../utility.h"
 #include "gameevent.h"
 #include "gameeventhandler.h"
+#include "eventsignal.h"
 
-#include "boost/signals2.hpp"
-
-typedef int ehid_t; // Handler ID type
-typedef int eid_t;  // Event ID type
-
-// Forward declare for the signal.
-class Dispatcher;
-
-// Interface to the signals. Serves to isolate the template to subclasses.
-// This is so I can put a std::map<int, SignalBase*> in the Dispatcher
-// without making Dispatcher itself a templated class.
-class SignalBase
-{
-    using conn_type = boost::signals2::connection;
-
-protected:
-    std::map<ehid_t, conn_type> conn_map;
-    virtual void isDerived() = 0; // forcing a pure virtual base class
-
-public:
-    SignalBase() {}
-    virtual ~SignalBase() {}
-    void disconnect(ehid_t h_id);
-};
-
-template <class T> class EventSignal : public SignalBase {
-    boost::signals2::signal<int (void *, T)> sig;
-    void isDerived() {} // concrete
-
-public:
-    int  execSignal(void * caller, T& data);
-    void connect(GameEventHandler<T> hnd, ehid_t h_id);
-    int  operator()(void * caller, T& data);
-
-    using force_type = T;
-};
-
-template <class T>
-int EventSignal<T>::execSignal(void *caller, T &data)
-{
-    // Weird call
-    return operator()(caller, data);
-}
-
-template <class T>
-void EventSignal<T>::connect(GameEventHandler<T> hnd, ehid_t h_id)
-{
-    if(conn_map.find(h_id) == conn_map.end()) {
-        conn_map[h_id] = sig.connect(hnd);
-    }
-}
-
-template <class T>
-int EventSignal<T>::operator()(void * caller, T& data)
-{
-    return *sig(caller, data);
-}
+const ehid_t FIRST_HANDLER_ID = 1;
+const eid_t FIRST_EVENT_ID = 1;
 
 class Dispatcher
 {
@@ -138,17 +89,31 @@ class Dispatcher
     // Could also do an event queue
     // Would cast void* to type T, whatever that type is, to enable data passing
     // Well, the event already has data inside of it, so the void* isn't needed
+    //
+    // NEW DESIGN THING: make this a call stack, only use it to prevent
+    // infinite recursion.
     //std::queue<int> event_queue; // Event ID queue
+
+    // The caller is either this or a substitute form of this. It's meant to
+    // give handlers a way to emit events themselves.
+    void * caller_;
 
     ehid_t getFirstUnusedHandlerId();
     eid_t  getFirstUnusedEventId();
 
+    // Both of these functions return an invalid handle if the passed-in objects
+    // weren't registered first.
     template <class T> eid_t  getEventId(GameEvent<T> &e);
     template <class T> ehid_t getHandlerId(GameEventHandler<T> &h);
 
-    bool isHandlerInList();
+    bool isHandlerInList(); // I forgot what I was doing with this ...
+
+    // If I need to debug events, a function like this may come in handy
+    //void printEventsToFile();
 
 public:
+    Dispatcher() : caller_(this) {} // Technically illegal, I think. Works on
+                                    // my machine, so not changing it.
     // Must delete any pointers in the maps
     virtual ~Dispatcher();
 
@@ -165,11 +130,27 @@ public:
                        // "same" events to exist.
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
-    template <class T> int emitEvent(GameEvent<T>& e, bool);
+    template <class T, class A> int emitEvent(GameEvent<T>& e,
+                                              A register_if_not_present);
     template <class T> int emitEvent(eid_t e_id,
                                      typename EventSignal<T>::force_type data);
     template <class T> int emitEvent(eid_t e_id);
-    template <class T> void setData(int e_id, T data);
+    template <class T> void setData(eid_t e_id, T data) {
+        if(event_list.find(e_id) == event_list.end()) {
+            return;
+        }
+        dynamic_cast< GameEvent<T> * >(event_list[e_id])->setData(data);
+    }
+    template <class T> T getData(eid_t e_id) {
+        return (event_list.find(e_id) == event_list.end() ? T() :
+            dynamic_cast< GameEvent<T> * >(event_list[e_id])->getData());
+    }
+
+    void * setCaller(void * caller = nullptr) {
+        caller_ = (caller == nullptr ? this : caller);
+        return caller_;
+    }
+    void * resetCaller() { return setCaller(); }
 
     static void test();
 
@@ -233,7 +214,7 @@ eid_t Dispatcher::getEventId(GameEvent<T> &e) {
 }
 
 template <class T>
-eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
+eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = false)
 {
     // Add event to event_list if not already on it
     eid_t e_id = getEventId(e);
@@ -258,9 +239,12 @@ eid_t Dispatcher::registerEvent(GameEvent<T> &e, bool override = true)
     return new_id;
 }
 
-template <class T>
+// Note: register_if_not_present both sregister AND de-registers
+template <class T, class A>
 int Dispatcher::emitEvent(GameEvent<T>& e,
-                          bool register_if_not_present = true) {
+                          A register_if_not_present = true) {
+    static_assert(std::is_same<A, bool>::value,
+                  "emitEvent(GameEvent<T>&, bool) called with non-bool");
     // Check registration status.
     eid_t eid = getEventId(e);
     bool do_register = false;
@@ -309,7 +293,7 @@ int Dispatcher::emitEvent(eid_t e_id,
     // --> USED TO throw, switched from 'at' to 'find' so it shouldn't anymore
     if(sig_map.find(e_id) != sig_map.end()) {
         return
-            dynamic_cast<EventSignal<T>*>(sig_map.at(e_id))->execSignal(this,
+            dynamic_cast<EventSignal<T>*>(sig_map.at(e_id))->execSignal(caller_,
                                                                         data);
     }
     return 0;

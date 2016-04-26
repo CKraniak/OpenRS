@@ -45,6 +45,30 @@ public:
     bool operator==(EventBase & that) {
         return (this->name_.compare(that.getName()) == 0);
     }
+
+    int pushType(std::string type) {
+        types_.push_back(type);
+        name_ += "_" + type;
+        return types_.size();
+    }
+    std::string popType() {
+        std::string rval = *(types_.rbegin());
+        // TODO: remove part of name added due to a push
+        types_.pop_back();
+        return rval;
+    }
+    // w00p, golf that shit
+    std::string getDebugPrintString() {
+        return (name_ + [this]()
+                        {
+                            std::string r;
+                            for(auto s: types_) {
+                                r += ';';
+                                r += s;};
+                            return r;
+                        } ());
+    }
+
     virtual ~EventBase() {}
 
 };
@@ -81,7 +105,15 @@ public:
           data_type_name(typeid(T).name()) {
         name_ = name;
         types_ = types;
-        has_data= true;
+        has_data = true;
+    }
+    GameEvent(std::string name,
+              std::vector<std::string> types):
+          data_(T()),
+          data_type_name(typeid(T).name()) {
+        name_ = name;
+        types_ = types;
+        has_data = false;
     }
 
     T                        getData()  const { return data_; }
