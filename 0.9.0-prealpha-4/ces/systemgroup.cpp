@@ -10,9 +10,9 @@
  */
 #include "systemgroup.h"
 
-bool SystemGroup::connectSystem(CESystem *system) {
-    system->connectDispatcher(disp_.get());
-    systems_.push_back(std::shared_ptr<CESystem>(system));
+bool SystemGroup::connectSystem(std::shared_ptr<CESystem> system) {
+    system.get()->connectDispatcher(disp_);
+    systems_.push_back(system);
     return true;
 }
 

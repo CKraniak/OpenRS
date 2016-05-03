@@ -26,10 +26,12 @@ public:
 			width_(width),
 			height_(height),
 			grid_(width * height, DEFAULT_GROUND_ASCII_CHAR) {
-		grid_[width * height / 2] = 'P';
+        grid_[width * height / 2] = 'P';
 	}
 	std::vector<char> getRenderData();
 	bool setGridChar(char c, int x, int y);
+    void onDispatcherAvailable();
+    void test_handler() { INFO_MSGOUT("Test in ADCES"); }
 };
 
 #endif // ASCIIDISPLAYCESYSTEM_H

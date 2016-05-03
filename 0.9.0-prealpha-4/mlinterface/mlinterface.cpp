@@ -21,7 +21,7 @@
 
 // This is the OS-specific selector
 std::unique_ptr<MLInterface>
-MLInterface::getInterface(StatefulDispatcher * disp) {
+MLInterface::getInterface(std::shared_ptr<StatefulDispatcher> disp) {
 #if defined(_WIN32)
     std::unique_ptr<MLInterface> ptr(new MLInterfaceWindows(disp));
     ptr.get()->init_();

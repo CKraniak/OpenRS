@@ -40,19 +40,20 @@ class CESystem
     // Well, no. That's the whole point of subclassing this: to provide
     // the specific required functionality in the subclass.
 
-    // Dispatcher the entity gets events from
-    std::shared_ptr<StatefulDispatcher> disp_;
 
 protected:
     void pushNeededSignature(EntitySignature & sig) {
         signatures_handled_.push_back(sig);
     }
+    // Dispatcher the entity gets events from
+    std::shared_ptr<StatefulDispatcher> disp_;
 
 public:
     CESystem();
     bool entityHasNeededComponents(Entity & e);
     virtual int run(std::vector<Entity> & entity_list) {}
-    bool connectDispatcher(StatefulDispatcher *);
+    void connectDispatcher(std::shared_ptr<StatefulDispatcher>);
+    virtual void onDispatcherAvailable() { return; }
 };
 
 // Subclasses of a ScriptedCESystem are meant to fill the script function map

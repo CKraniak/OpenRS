@@ -110,9 +110,9 @@ public:
     template <class T> eid_t registerEvent(GameEvent<T>& e, bool override);
                        int   unregisterEvent(eid_t e_id);
 
-    template <class data_type, class bool_type>
+    template <class data_type, class bool_type = bool>
                                int emitEvent(GameEvent<data_type>& e,
-                                             bool_type register_if_not_present);
+                                             bool_type register_if_not_present = true);
     template <class data_type> int emitEvent(eid_t e_id,
                                              typename EventSignal<data_type>::force_type data);
     template <class data_type> int emitEvent(eid_t e_id);
@@ -133,6 +133,9 @@ public:
     // ***********************************
 
     StatefulDispatcher();
+    virtual ~StatefulDispatcher() {
+
+    }
 
     static void test();
 };
@@ -245,7 +248,7 @@ eid_t StatefulDispatcher::registerEvent(GameEvent<data_type> &e,
 
 template <class data_type, class bool_type>
 int StatefulDispatcher::emitEvent(GameEvent<data_type> &e,
-                                  bool_type register_if_not_present = true)
+                                  bool_type register_if_not_present)
 {
     static_assert(std::is_same<bool_type, bool>::value,
                   "emitEvent(GameEvent<data_type>&, bool) called with non-bool");

@@ -32,7 +32,7 @@ int StatefulDispatcher::unregisterEvent(eid_t e_id)
 
 }
 
-StatefulDispatcher::StatefulDispatcher()
+StatefulDispatcher::StatefulDispatcher() : state_(""), prev_state_("")
 {
 }
 

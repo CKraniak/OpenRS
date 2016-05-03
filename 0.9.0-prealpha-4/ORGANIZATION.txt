@@ -410,3 +410,29 @@ The state will switch to whatever is configured next. So if the state goes to
   selection (which is a component of main_menu) based on the arrow keys and
   throw events on the updates.
 - The on_enter of each button will say something like ""
+
+********************************************************************
+
+KNOWN SYSTEMS:
+ - Ascii Display
+ - OpenGL 2D Display
+ - Audio
+ - Player Movement
+ - Collision
+ - Input
+ - "Database" (for entity / component storage)
+ - LoadEntity
+ - SaveGame
+ - LoadGame
+ - MeleeCombat
+ - RangedCombat
+ - View
+ - Minimap
+ - AI
+ - Hunger
+ - Health
+ - Inventory (player, chests, shelves, NPCs, etc.)
+   - stowable=true (adds pick up / drop commands)
+   - max_stack=INT (most stacks an item can have in an arbitrary inventory)
+ - Menu
+ - Interact

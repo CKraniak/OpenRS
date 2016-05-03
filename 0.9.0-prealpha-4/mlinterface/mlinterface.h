@@ -49,16 +49,16 @@ protected:
     // system.
     //
     // Note: since it's not new'd, it doesn't need a smart pointer.
-    StatefulDispatcher * disp_;
+    std::shared_ptr<StatefulDispatcher> disp_;
     virtual void init_() {}
 
 public:
-    MLInterface(StatefulDispatcher * disp) :
+    MLInterface(std::shared_ptr<StatefulDispatcher> disp) :
         quit_(false),
         disp_(disp) {}
     virtual ~MLInterface() = default;
     // This is the OS-specific selector
-    static std::unique_ptr<MLInterface> getInterface(StatefulDispatcher *);
+    static std::unique_ptr<MLInterface> getInterface(std::shared_ptr<StatefulDispatcher>);
 
     void setQuit(bool q = true) { this->quit_ = q; }
     bool shouldQuit() { return this->quit_; }

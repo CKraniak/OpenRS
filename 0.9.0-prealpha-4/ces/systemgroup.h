@@ -35,9 +35,9 @@ class SystemGroup
     std::shared_ptr<StatefulDispatcher> disp_;
 
 public:
-    SystemGroup(StatefulDispatcher * disp) :
+    SystemGroup(std::shared_ptr<StatefulDispatcher> disp) :
         disp_(disp) {}
-    bool connectSystem(CESystem * system);
+    bool connectSystem(std::shared_ptr<CESystem> system);
     // Initialize will cause SystemGroup to send an "init" event via the
     // dispatcher. All connected systems should run their initialization at
     // that time.

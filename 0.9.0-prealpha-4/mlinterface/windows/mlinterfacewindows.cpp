@@ -160,7 +160,7 @@ void MLInterfaceWindows::unsetFont(HDC dc) {
     }
 }
 
-MLInterfaceWindows::MLInterfaceWindows(StatefulDispatcher * disp) :
+MLInterfaceWindows::MLInterfaceWindows(std::shared_ptr<StatefulDispatcher> disp) :
         MLInterface(disp),
         display_text("INIT"),
         font(NULL),
@@ -258,6 +258,8 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
 
     case WM_CHAR:
         if(w_param == VK_ESCAPE) {
+            static GameEvent<int> esc_event("esc_event_test", {"on_key_esc"}, 0);
+            this_->disp_.get()->emitEvent<int>(esc_event);
             PostMessage(h_wnd, WM_CLOSE, 0, 0);
         }
         break;

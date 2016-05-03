@@ -46,7 +46,7 @@ class MLInterfaceWindows : public MLInterface {
     }
 
 public:
-    MLInterfaceWindows(StatefulDispatcher *);
+    MLInterfaceWindows(std::shared_ptr<StatefulDispatcher>);
     void update();
     void render();
     void emptyMessagePump();

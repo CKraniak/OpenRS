@@ -17,10 +17,8 @@
 int openrs_main(int argc, char** argv) {
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
-//    StatefulDispatcher sd = StatefulDispatcher();
-    Dispatcher::test();
-
-    SystemGroup systems(&sd);
+    auto sd = std::shared_ptr<StatefulDispatcher>(new StatefulDispatcher());
+    SystemGroup systems(sd);
 
     // - TODO: Process command-line args and config file here
 
@@ -36,20 +34,20 @@ int openrs_main(int argc, char** argv) {
     // control system connection is important. Or if I want to adjust the
     // composure of the systems in a config file, then main is the right place
     // to process the config file and divvy out the system composures.
-    AsciiDisplayCESystem adces;
-    systems.connectSystem(&adces);
+    std::shared_ptr<AsciiDisplayCESystem> adces(new AsciiDisplayCESystem());
+    systems.connectSystem(adces);
 
-    InputCESystem ices;
-    systems.connectSystem(&ices);
+    std::shared_ptr<InputCESystem> ices(new InputCESystem());
+    systems.connectSystem(ices);
 
-    PlayerMovementCESystem pmces;
-    systems.connectSystem(&pmces);
+    std::shared_ptr<PlayerMovementCESystem> pmces(new PlayerMovementCESystem());
+    systems.connectSystem(pmces);
 
     // **************************
 
     // Start OS-specific code in the Main Loop Interface class.
     // Mostly should involve grabbing OS events.
-    std::unique_ptr<MLInterface> mli = MLInterface::getInterface(&sd);
+    std::unique_ptr<MLInterface> mli = MLInterface::getInterface(sd);
 
     // **************************
     //
@@ -57,11 +55,11 @@ int openrs_main(int argc, char** argv) {
     //sd.setState("init");
 
     // **************************
-    mli.get()->createMainWindow();
-    while ( ! mli.get()->shouldQuit() ) {
+    mli->createMainWindow();
+    while ( ! mli->shouldQuit() ) {
         // main loop:
         //  - look for input, process if available
-        mli.get()->emptyMessagePump();
+        mli->emptyMessagePump();
         //  - update
         //  - render
     }

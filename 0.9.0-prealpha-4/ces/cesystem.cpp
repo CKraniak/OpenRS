@@ -13,11 +13,10 @@
 
 CESystem::CESystem()
 {
-
 }
 
-bool CESystem::connectDispatcher(StatefulDispatcher * disp)
+void CESystem::connectDispatcher(std::shared_ptr<StatefulDispatcher> disp)
 {
-    disp_ = std::shared_ptr<StatefulDispatcher>(disp);
-    return true;
+    disp_ = disp;
+    onDispatcherAvailable();
 }

@@ -77,9 +77,9 @@
 class hc_##NAME : public GameEventHandler<TYPE> {                              \
 public:                                                                   \
     hc_##NAME(std::string s) : GameEventHandler<TYPE>(s,                       \
-                                                     [](void * parent, \
-                                                        TYPE input) -> int DEF ) { \
-}  \
+                                                      [](void * parent, \
+                                                         TYPE input, \
+                                                         void * that) -> int DEF ) {} \
 }; hc_##NAME NAME(MATCH);
 
 class Dispatcher;
@@ -124,7 +124,7 @@ public:
         data_type_name = typeid(T).name();
         is_base = false;
     }
-    GameEventHandler(std::string boolean_string, int (*f)(void *, T)) {
+    GameEventHandler(std::string boolean_string, int (*f)(void *, T, void *), void * that = nullptr) {
         static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
         BooleanCombinationTreeGenerator gen;
         bool_tree = gen.compile(boolean_string);
@@ -132,6 +132,7 @@ public:
         boolean_string_ = boolean_string;
         is_base = false;
         run_ = f;//orrest, run!
+        that_ = that;
     }
     GameEventHandler(const GameEventHandler & that) {
         static_assert(std::is_constructible<T>::value, "GameEventHandler type must be constructible");
@@ -143,10 +144,12 @@ public:
         this->run_ = that.run_;
     }
 
+    void setThat(void * that) { that_ = that; }
+
     virtual ~GameEventHandler() {}
     //virtual int operator()(T data) { return run_(data); }
     virtual int operator()(void * parent_, T data) {
-        return run_(parent_, data);
+        return run_(parent_, data, that_);
     }
 
     // run_ is a function pointer to a (user-supplied) function which is run
@@ -155,7 +158,8 @@ public:
     // in a subclass like I would otherwise do. I'm pretty sure this has
     // something to do with limitations in the way boost does things with
     // polymorphic base classes in signals2.
-    int (* run_)(void *, T);
+    int (* run_)(void *, T, void *);
+    void * that_;
 };
 
 namespace comment_collapser__ { // Some editors can collapse / hide this block.
