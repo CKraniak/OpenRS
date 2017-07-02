@@ -13,8 +13,18 @@
 #include "dispatcher/statefuldispatcher.h"
 #include "ces/systemgroup.h"
 #include "ces/systems/systems.h"
+#include "fileio/cesio.h"
+
+#include "fileio/directory.h"
 
 int openrs_main(int argc, char** argv) {
+
+    CesIo::test();
+    return 0;
+
+
+
+
     // - Start event system. Since this is the big intra-communication device,
     //   it will generally come first.
     auto sd = std::shared_ptr<StatefulDispatcher>(new StatefulDispatcher());
@@ -37,17 +47,28 @@ int openrs_main(int argc, char** argv) {
     std::shared_ptr<AsciiDisplayCESystem> adces(new AsciiDisplayCESystem());
     systems.connectSystem(adces);
 
-    std::shared_ptr<InputCESystem> ices(new InputCESystem());
-    systems.connectSystem(ices);
+//    std::shared_ptr<InputCESystem> ices(new InputCESystem());
+//    systems.connectSystem(ices);
 
     std::shared_ptr<PlayerMovementCESystem> pmces(new PlayerMovementCESystem());
     systems.connectSystem(pmces);
+
+    std::shared_ptr<CollisionCESystem> cces(new CollisionCESystem());
+    systems.connectSystem(cces);
+
+    std::shared_ptr<GameGridCESystem> ggces(new GameGridCESystem());
+    systems.connectSystem(ggces);
 
     // **************************
 
     // Start OS-specific code in the Main Loop Interface class.
     // Mostly should involve grabbing OS events.
     std::unique_ptr<MLInterface> mli = MLInterface::getInterface(sd);
+
+    // Here is where renderer INIT will go
+    // The display system will need its 3-state setup at some point.
+    // Right now the focus is on completing the CES first, which means a
+    // barebones rendering system right now.
 
     // **************************
     //
@@ -58,10 +79,13 @@ int openrs_main(int argc, char** argv) {
     mli->createMainWindow();
     while ( ! mli->shouldQuit() ) {
         // main loop:
-        //  - look for input, process if available
+        //  - look for input, process if available, reach and update game data
+        //    as required.
         mli->emptyMessagePump();
-        //  - update
-        //  - render
+        //  - update --> everything draws to dirty Layers down the display tree
+        //               and back up again
+        //  - render --> render gets a list of stuff updated and the new data
+        //               and pushes it all to the GPU
     }
     return 0;
 }

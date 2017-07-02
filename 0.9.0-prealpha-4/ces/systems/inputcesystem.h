@@ -22,6 +22,13 @@
 //     "on_numpad=run_system(MOVEMENT, <func_name>, entity_id)"
 // I'll need something that can resolve this to the right thing. Maybe a script
 // system that, in a barebones state, only supports the "run_system" call.
+
+// *******************************
+
+// As of 5-26-16, the above described behavior will probably not be pursued.
+// The systems will each handle their own crap through the StatefulDispatcher,
+// setting up handlers themselves. So the InputCESystem is now deprecated /
+// useless.
 struct KeyInData;
 
 class InputCESystem : public CESystem {

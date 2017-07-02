@@ -56,7 +56,7 @@ public:
     MLInterface(std::shared_ptr<StatefulDispatcher> disp) :
         quit_(false),
         disp_(disp) {}
-    virtual ~MLInterface() = default;
+    virtual ~MLInterface() {}
     // This is the OS-specific selector
     static std::unique_ptr<MLInterface> getInterface(std::shared_ptr<StatefulDispatcher>);
 

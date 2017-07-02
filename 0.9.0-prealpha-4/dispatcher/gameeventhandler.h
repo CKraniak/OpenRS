@@ -142,6 +142,7 @@ public:
         // :TODO: This could be made better:
         this->bool_tree = BooleanCombinationTreeGenerator().compile(this->boolean_string_);
         this->run_ = that.run_;
+        this->that_ = that.that_;
     }
 
     void setThat(void * that) { that_ = that; }

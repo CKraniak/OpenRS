@@ -19,6 +19,7 @@ public:
         pos_y(y) {}
     int onNumpad(char , AsciiDisplayCESystem &); // Apply a transform to the
                          // player object
+    void onDispatcherAvailable();
 };
 
 #endif // PLAYERMOVEMENTCESYSTEM_H

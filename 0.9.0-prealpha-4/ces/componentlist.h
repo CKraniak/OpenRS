@@ -13,32 +13,45 @@
 // to grab the components from somewhere.
 //
 // There will actually be a "main list" somewhere, but this class handles the
-// more general case of N Components, and queryign certain kinds of information
+// more general case of N Components, and querying certain kinds of information
 // on the N components.
 
 #ifndef COMPONENTLIST_H
 #define COMPONENTLIST_H
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 #include "component.h"
 
-struct ComponentIdList {
-    std::vector<int> id_list_;
-};
-
 class ComponentList
 {
-    ComponentIdList id_list_;
-    std::map<int, std::shared_ptr<Component>>  coomponent_id_map_;
+    std::vector<int> id_list_;
+    std::unordered_map<int, std::shared_ptr<Component>>  component_id_map_;
+    int count_;
 
     int getFirstUnusedId();
 
 public:
     ComponentList();
-    Component getComponentById(int id);
+    // Currently does not check for existence
+    std::shared_ptr<Component> getComponentById(int id) {
+        return component_id_map_[id];
+    }
+    std::shared_ptr<Component> getComponentByIndex(int i) {
+        return component_id_map_[id_list_[i]];
+    }
+    int pushUniqueComponent(Component c) {
+        int component_id = c.getId();
+        if(component_id_map_.find(component_id) == component_id_map_.end()) {
+            component_id_map_[component_id] =
+                    std::shared_ptr<Component>(new Component(c));
+            id_list_.push_back(component_id);
+        }
+    }
+
+    int getNumComponents() { return component_id_map_.size(); }
 };
 
 #endif // COMPONENTLIST_H

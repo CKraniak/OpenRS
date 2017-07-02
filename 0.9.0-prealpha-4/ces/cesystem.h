@@ -40,6 +40,7 @@ class CESystem
     // Well, no. That's the whole point of subclassing this: to provide
     // the specific required functionality in the subclass.
 
+    static Entity active_entity_; // shared instance for all handlers to use?
 
 protected:
     void pushNeededSignature(EntitySignature & sig) {
@@ -54,6 +55,7 @@ public:
     virtual int run(std::vector<Entity> & entity_list) {}
     void connectDispatcher(std::shared_ptr<StatefulDispatcher>);
     virtual void onDispatcherAvailable() { return; }
+    virtual void onAsciiCoreAvailable() { return; }
 };
 
 // Subclasses of a ScriptedCESystem are meant to fill the script function map

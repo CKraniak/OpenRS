@@ -21,6 +21,7 @@
 
 #include "cesio.h"
 #include "../utility.h"
+#include "directory.h"
 
 int CesIo::loadFromFile(std::string filename)
 {
@@ -243,4 +244,16 @@ CesIoToken::TOKEN_TYPE CesIoToken::typeOfChar(char c)
         // Due to <windows.h>, the CesIoToken namespace must be specified
         return CesIoToken::WORD;
     }
+}
+
+void CesIo::test()
+{
+    // Check that the test files are available
+    // Open entity_player.txt
+    // Check each name:value pair
+    // Do the same with others
+    INFO_MSGOUT_DEBUG("CesIo Test Routine");
+    std::unique_ptr<Directory> d = Directory::getDirectory();
+    std::string cwd = d->getCwd();
+    INFO_MSGOUT_DEBUG(cwd.c_str());
 }

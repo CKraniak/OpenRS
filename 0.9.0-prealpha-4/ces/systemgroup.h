@@ -16,6 +16,7 @@
 
 #include "cesystem.h"
 #include "../dispatcher/statefuldispatcher.h"
+#include "../graphics/asciicore.h"
 
 // So how would systems be hooked in?
 
@@ -31,12 +32,14 @@
 
 class SystemGroup
 {
-    std::vector<std::shared_ptr<CESystem>> systems_;
-    std::shared_ptr<StatefulDispatcher> disp_;
+    std::vector<std::shared_ptr<CESystem>> systems_; // CESystems
+    std::shared_ptr<StatefulDispatcher> disp_; // Event system
+    std::shared_ptr<AsciiCore> ascii_core_; // Display system
 
 public:
     SystemGroup(std::shared_ptr<StatefulDispatcher> disp) :
         disp_(disp) {}
+    bool connectAsciiCore(std::shared_ptr<AsciiCore> ascii_core);
     bool connectSystem(std::shared_ptr<CESystem> system);
     // Initialize will cause SystemGroup to send an "init" event via the
     // dispatcher. All connected systems should run their initialization at

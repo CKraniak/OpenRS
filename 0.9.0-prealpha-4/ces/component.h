@@ -60,9 +60,13 @@ class Component
 
     int generateUniqueId();
 public:
-    Component() : script_("") {}
+    Component() : script_(""), str_data_(), name_() {}
     Component(std::string name, std::string value) :
-        name_(name), str_data_(value), script_(value) {}
+        name_(name),
+        str_data_(value),
+        script_(value),
+        id_(generateUniqueId())
+         {}
     std::string getName() { return name_; }
     bool hasSameName(const Component & that);
 
@@ -72,9 +76,13 @@ public:
         script_ = BarebonesScript(data);
     }
     std::string getData() { return str_data_; }
-    int getDataAsInt() { return std::stoi(str_data_); }
-    double getDataAsDouble() { return std::stod(str_data_); }
+    int getDataAsInt() { return str_data_.empty() ? 0 :
+                                                    std::stoi(str_data_); }
+    double getDataAsDouble() { return str_data_.empty() ? 0 :
+                                                          std::stod(str_data_); }
     BarebonesScript getDataAsScript() { return script_; }
+
+    int getId() { return id_; }
 };
 
 #endif // COMPONENT_H

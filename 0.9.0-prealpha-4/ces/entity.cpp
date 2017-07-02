@@ -20,3 +20,26 @@ Entity::Entity()
 {
 
 }
+
+int Entity::numComponentsWithName(std::string name) {
+    if(component_nametable_.find(name) !=
+            component_nametable_.end()) {
+        return component_nametable_[name].getNumComponents();
+    }
+    return 0;
+}
+
+ComponentList Entity::getComponentListWithName(std::string name) {
+    auto retval = component_nametable_.find(name);
+    return (retval == component_nametable_.end()) ? ComponentList() :
+                                                    (*retval).second;
+}
+
+int Entity::pushComponent(Component c) {
+    std::string name = c.getName();
+    auto clist_it = component_nametable_.find(name);
+    if (clist_it == component_nametable_.end()) {
+        component_nametable_[name] = ComponentList();
+    }
+    return component_nametable_[name].pushUniqueComponent(c);
+}

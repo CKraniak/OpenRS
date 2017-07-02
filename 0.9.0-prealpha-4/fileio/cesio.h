@@ -74,6 +74,7 @@ public:
     int loadFromFile(std::string filename);
     int getBytesRead() { return bytes_read_; }
     std::string getFilename() { return filename_; }
+    static void test();
 
 private:
     std::string filename_;

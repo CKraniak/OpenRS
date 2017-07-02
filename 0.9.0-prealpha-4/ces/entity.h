@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 #include "../fileio/cesio.h"
 #include "componentlist.h"
@@ -21,7 +21,7 @@
 class Entity
 {
     int id_;
-    ComponentList component_list_;
+    std::unordered_map<std::string, ComponentList> component_nametable_;
     std::string entity_type_name_; // e.g. "district", "player", "monster"
                                    // entity_type_name is only for readability;
                                    // any use in game logic is an error, as
@@ -29,12 +29,12 @@ class Entity
                                    // b.) rely on the components the entity has,
                                    // to determine what it is, not the name.
     bool emit_event_on_update_;
-    int generateUniqueId();
+    int generateUniqueEntityId();
 public:
     Entity();
     int numComponentsWithName(std::string name);
-    std::vector<int> getComponentsWithName();
-    int removeComponentById(int);
+    ComponentList getComponentListWithName(std::string name);
+    int pushComponent(Component c);
 };
 
 #endif // ENTITY_H

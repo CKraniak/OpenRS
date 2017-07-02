@@ -1,4 +1,4 @@
-/* Copyright (C) 2016, Chesley Kraniak
+/* Copyright (C) 2017, Chesley Kraniak
  *
  * This code is distributed under the terms of the GPLv3 license, which should
  * have been included with this file in the root directory as "LICENSE.txt". If
@@ -23,10 +23,37 @@
 //
 // Need to figure out how to reference based on where the .exe is.
 
+// Notes: if you get an empty value form getFilenamesInDirectory or
+// getSubdirectoriesInDirectory, either check the validity of your dir input
+// or check the error value with getError. If you know your dir was ok, it
+// could be the dir was empty.
+//
+// Or you could check for existence before you try to read the directory.
+
+#include <vector>
+#include <string>
+#include <memory>
+
 class Directory
 {
 public:
-    Directory();
+    typedef enum { NONE = 0, BAD_FILEHANDLE, UNKNOWN_ERROR } DIRECTORY_ERROR;
+
+    Directory() {}
+    virtual ~Directory() {}
+
+    virtual std::vector<std::string> getFilenamesInDirectory(std::string dir = "") = 0;
+    virtual std::vector<std::string> getSubdirectoriesInDirectory(std::string dir = "") = 0;
+    virtual std::string getCwd() = 0;
+    DIRECTORY_ERROR getError() { return this->error_; }
+    virtual bool existsFile(std::string filename, std::string path = "") = 0;
+    virtual bool existsDirectory(std::string path) = 0;
+
+    static void test();
+    static std::unique_ptr<Directory> getDirectory();
+
+protected:
+    DIRECTORY_ERROR error_;
 };
 
 #endif // DIRECTORY_H

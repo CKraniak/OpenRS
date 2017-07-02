@@ -11,7 +11,7 @@
 #include "systemgroup.h"
 
 bool SystemGroup::connectSystem(std::shared_ptr<CESystem> system) {
-    system.get()->connectDispatcher(disp_);
+    system->connectDispatcher(disp_);
     systems_.push_back(system);
     return true;
 }

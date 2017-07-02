@@ -12,7 +12,7 @@
 #include "mlinterface.h"
 
 #if defined(_WIN32)
-    #include "./windows/mlinterfacewindows.h"
+    #include "../platform/windows/mlinterfacewindows.h"
 #else
 #error "Non-Windows systems not implemented; please write a MLInterface for " \
     "your OS"

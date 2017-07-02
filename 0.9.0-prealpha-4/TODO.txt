@@ -1,0 +1,7 @@
+- Finish CES:
+  - Load from files -> fill in EntityTypes -> make with EntityFactory
+  - Make it more convenient for systems to get components off of entities
+    - EntitySignature
+- Finish connecting up the dispatcher
+- Switch the grid out of AsciiDisplayCES, to gamegrid
+- Start display system work

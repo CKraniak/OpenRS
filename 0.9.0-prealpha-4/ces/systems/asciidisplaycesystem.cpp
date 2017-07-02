@@ -1,5 +1,34 @@
 #include "asciidisplaycesystem.h"
 
+// So currently this system does the everything on its own.
+//
+// What I want in the long run is for the code to be arranged as follows:
+// - DisplayCES: display things
+//    - AsciiDisplayCES: I/O for the AsciiRenderer and AsciiCore, interface
+//      to DisplayCES
+//       - AsciiRenderer: Displays AsciiCore data
+//          - GraphicsDriver: provides line and quad drawing ability which
+//            renderer will use
+//       - AsciiCore: Ascii window manager functionality
+//
+// Update cycle:
+//    - main sends any input events out
+//       - input events affect whatever they affect, state changes, player
+//         movements, etc.
+//    - main sends a tick event with a delta t argument
+//    - DisplaySystem calls down to propogate tick
+//    - AsciiDisplay propogates to AsciiCore
+//    - AsciiCore grabs anything it needs from things that have marked
+//      themselves dirty (an "update" event, with a list arg that things
+//      push their info onto, I suppose)
+//
+// Render cycle:
+//    - main loop sends render event, caught by DisplayCES
+//    - DisplayCES gets the right sub-Display CES (Ascii) and rethrows event
+//    - AsciiDisplayCES gets render data  out of AsciiCore and sends to
+//      the AsciiRenderer
+//    - AsciiRenderer uses GraphicsDriver to write to screen (interfaces
+//      game render data to the driver's needs)
 std::vector<char> AsciiDisplayCESystem::getRenderData()
 {
     std::vector<char> out;
@@ -49,8 +78,13 @@ public:
 
 void AsciiDisplayCESystem::onDispatcherAvailable()
 {
-    adces_on_esc<decltype(this)> hnd(this);
-    test_esc_handler.setThat(this);
-    disp_->registerHandler<int>(test_esc_handler);
-    disp_->registerHandler<int>(hnd);
+//    adces_on_esc<decltype(this)> hnd(this);
+//    test_esc_handler.setThat(this);
+//    disp_->registerHandler<int>(test_esc_handler);
+    //    disp_->registerHandler<int>(hnd);
+}
+
+void AsciiDisplayCESystem::onAsciiCoreAvailable()
+{
+
 }

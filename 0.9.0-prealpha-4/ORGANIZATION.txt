@@ -397,7 +397,7 @@ So upon start, we will specify the load directory in main; this could be config
 controlled. The directory goes to the LoadEntity system. When the systems get
 inited, LoadEntity will load the whole directory, then emit an event to the
 effect of "entities_loaded" with list pointers in the data fields. The database
-will see this event and suck in all the entities from that.
+will see this event and suck in all the entities from that. --> NOW CHANGED
 
 The state will switch to whatever is configured next. So if the state goes to
 "main_menu", the next few things that happen will be:
@@ -416,6 +416,8 @@ The state will switch to whatever is configured next. So if the state goes to
 KNOWN SYSTEMS:
  - Ascii Display
  - OpenGL 2D Display
+   - So basically I should make a window system and have it use display drivers
+   - Then I can have menu layouts and the game layout
  - Audio
  - Player Movement
  - Collision
@@ -436,3 +438,50 @@ KNOWN SYSTEMS:
    - max_stack=INT (most stacks an item can have in an arbitrary inventory)
  - Menu
  - Interact
+
+********************************************************************
+
+DISPLAY SYSTEM
+
+2 main sets: CORE and RENDERER
+
+CORE is data containers (primitives and whatnot) and management of such
+RENDERER pushes the CORE data to the OS
+
+This is done so that later in development I can implement a triple-buffer
+(3 cores) and have update() affect one core while render() affects another.
+So the core has things that get pushed up by CESystems, the renderer has OS
+interfaces.
+
+The MOVE event will:
+- Call player movement system (PMCES), which:
+--- Calls the grid system to see what's there / if there's a collision
+- The PMCES will (on no collision) call the grid again with a move COMMAND
+- The grid will tell the Ascii display system (ADCES) to update as appropriate
+- ADCES will push data to its CORE
+- Event returns
+
+When the main loop calls render(), the Ascii renderer will see the CORE has
+been made dirty and re-render it. CORE freshness data location has yet to be
+determined; it should be threadsafe though.
+
+On startup, we will need to make the core(s) and the renderer. render() will
+be part of MLInterface, but update() is a CES thing. main() will need to sort
+out which *core the renderer is rendering and which *core the CES is updating.
+
+Initially, there will only be one core, which will be connected to the ADCES
+and subsequently sent to the renderer for rendering. Essentially, neither the
+ADCES nor the renderer should care about threads at all, and if threads ever
+come up it will be main()'s job. That being said, both the ADCES and the
+renderer should not be wed to a particular *core, so main() can hotplug them
+at will.
+
+********************************************************************
+
+I've done it!
+
+EntityListReaders are managed by a manager  / single EntityList created by Main
+and passed into each via the SystemGroup (once again).
+
+Let's call the manager an ECList (Entity-Component List). It's purpose is to
+list relations between entities and components.
