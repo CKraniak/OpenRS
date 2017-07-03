@@ -1,26 +1,37 @@
+/* Copyright (C) 2017, Chesley Kraniak
+ *
+ * This code is distributed under the terms of the GPLv3 license, which should
+ * have been included with this file in the root directory as "LICENSE.txt". If
+ * you do not have a copy of the license, see:
+ *     http://www.gnu.org/licenses/gpl-3.0.txt
+ * or:
+ *     https://github.com/CKraniak/OpenRS
+ * for the license.
+ */
+
 #include <list>
 
 #include "gamegridcesystem.h"
 #include "../entity.h"
 
 std::pair<int, int> getLocationSingle(Entity e) {
-    assert(e.numComponentsWithName("location_x") == 1);
-    assert(e.numComponentsWithName("location_y") == 1);
-    std::pair<int, int> retval;
-    ComponentList xl = e.getComponentListWithName("location_x");
-    retval.first = xl.getComponentByIndex(0)->getDataAsInt();
-    ComponentList yl = e.getComponentListWithName("location_y");
-    retval.second = yl.getComponentByIndex(0)->getDataAsInt();
-    return retval;
+//    assert(e.numComponentsWithName("location_x") == 1);
+//    assert(e.numComponentsWithName("location_y") == 1);
+//    std::pair<int, int> retval;
+//    ComponentList xl = e.getComponentListWithName("location_x");
+//    retval.first = xl.getComponentByIndex(0)->getDataAsInt();
+//    ComponentList yl = e.getComponentListWithName("location_y");
+//    retval.second = yl.getComponentByIndex(0)->getDataAsInt();
+//    return retval;
 }
 
 void setLocationSingle(Entity e, int x, int y) {
-    assert(e.numComponentsWithName("location_x") == 1);
-    assert(e.numComponentsWithName("location_y") == 1);
-    ComponentList xl = e.getComponentListWithName("location_x");
-    xl.getComponentByIndex(0)->setData(std::to_string(x));
-    ComponentList yl = e.getComponentListWithName("location_y");
-    yl.getComponentByIndex(0)->setData(std::to_string(y));
+//    assert(e.numComponentsWithName("location_x") == 1);
+//    assert(e.numComponentsWithName("location_y") == 1);
+//    ComponentList xl = e.getComponentListWithName("location_x");
+//    xl.getComponentByIndex(0)->setData(std::to_string(x));
+//    ComponentList yl = e.getComponentListWithName("location_y");
+//    yl.getComponentByIndex(0)->setData(std::to_string(y));
 }
 
 struct TerrainTile {
@@ -113,8 +124,8 @@ GameGridCESystem::GameGridCESystem()
     Component x("location_x", "7");
     Component y("location_y", "7");
 
-    grid_->player_.pushComponent(x);
-    grid_->player_.pushComponent(y);
+//    grid_->player_.pushComponent(x);
+//    grid_->player_.pushComponent(y);
     
     grid_->isTerrainTileBlockingPlayer(1, 1);
 }

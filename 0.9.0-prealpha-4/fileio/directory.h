@@ -42,8 +42,14 @@ public:
     Directory() {}
     virtual ~Directory() {}
 
-    virtual std::vector<std::string> getFilenamesInDirectory(std::string dir = "") = 0;
+    // ext ->  limit files to ones with a given extension.
+    virtual std::vector<std::string> getFilenamesInDirectory(std::string dir = "",
+                                                             std::string ext = "") = 0;
     virtual std::vector<std::string> getSubdirectoriesInDirectory(std::string dir = "") = 0;
+    // Get all files (with path attached to front) with extension "ext"
+    // in directory base_dir.
+    virtual std::vector<std::string> walk(std::string base_dir = "",
+                                          std::string ext = "") = 0;
     virtual std::string getCwd() = 0;
     DIRECTORY_ERROR getError() { return this->error_; }
     virtual bool existsFile(std::string filename, std::string path = "") = 0;

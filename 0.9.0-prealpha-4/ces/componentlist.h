@@ -21,32 +21,33 @@
 
 #include <vector>
 #include <unordered_map>
-#include <memory>
 
 #include "component.h"
 
 class ComponentList
 {
+    friend class ECList;
+
+private:
+    ComponentList() {}
+
     std::vector<int> id_list_;
-    std::unordered_map<int, std::shared_ptr<Component>>  component_id_map_;
+    std::unordered_map<int, Component>  component_id_map_;
     int count_;
 
     int getFirstUnusedId();
 
-public:
-    ComponentList();
     // Currently does not check for existence
-    std::shared_ptr<Component> getComponentById(int id) {
+    Component getComponentById(int id) {
         return component_id_map_[id];
     }
-    std::shared_ptr<Component> getComponentByIndex(int i) {
+    Component getComponentByIndex(int i) {
         return component_id_map_[id_list_[i]];
     }
     int pushUniqueComponent(Component c) {
         int component_id = c.getId();
         if(component_id_map_.find(component_id) == component_id_map_.end()) {
-            component_id_map_[component_id] =
-                    std::shared_ptr<Component>(new Component(c));
+            component_id_map_[component_id] =  c;
             id_list_.push_back(component_id);
         }
     }

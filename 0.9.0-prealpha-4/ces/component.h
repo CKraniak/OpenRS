@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+typedef int component_id_t;
+
 class ScriptedCESystem;
 
 class BarebonesScript {
@@ -50,15 +52,18 @@ public:
     bool isCompilable() { return is_compilable; }
 };
 
+// I am likely to add a union later to hold preprocessed data and strip out
+// calls to std::stoi() (after the first call) and such.
+
 class Component
 {
-    int id_;
+    component_id_t id_;
     std::string str_data_; // String representation of data, which would go in
                            // a file after the "=".
     std::string name_; // What comes before the "=".
     BarebonesScript script_;
 
-    int generateUniqueId();
+    component_id_t generateUniqueId();
 public:
     Component() : script_(""), str_data_(), name_() {}
     Component(std::string name, std::string value) :
@@ -82,7 +87,7 @@ public:
                                                           std::stod(str_data_); }
     BarebonesScript getDataAsScript() { return script_; }
 
-    int getId() { return id_; }
+    component_id_t getId() { return id_; }
 };
 
 #endif // COMPONENT_H

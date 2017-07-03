@@ -1,4 +1,4 @@
-/* Copyright (C) 2016, Chesley Kraniak
+/* Copyright (C) 2017, Chesley Kraniak
  *
  * This code is distributed under the terms of the GPLv3 license, which should
  * have been included with this file in the root directory as "LICENSE.txt". If

@@ -1,4 +1,4 @@
-/* Copyright (C) 2016, Chesley Kraniak
+/* Copyright (C) 2017 Chesley Kraniak
  *
  * This code is distributed under the terms of the GPLv3 license, which should
  * have been included with this file in the root directory as "LICENSE.txt". If
@@ -13,13 +13,34 @@
 #include "dispatcher/statefuldispatcher.h"
 #include "ces/systemgroup.h"
 #include "ces/systems/systems.h"
+#include "fileio/configuration.h"
 #include "fileio/cesio.h"
+#include "ces/ecmanager.h"
 
-#include "fileio/directory.h"
+#include  <cassert>
+
+// Generate commonly used configuration information.
+// Not to be confused with an application-wide singleton maker. Over my dead
+// body.
+//
+// If it's not something related to what you would learn from configuration.txt,
+// then it doesn't belong here / in the Configuration object.
+Configuration setupConfig () {
+    Configuration conf;
+    std::unique_ptr<Directory> d = Directory::getDirectory();
+
+    assert(conf.setConfiguration("exe_cwd", d->getCwd()));
+    assert(conf.setConfiguration("full_core_resource_dir",
+                                    conf.get("exe_cwd") +
+                                    conf.get("core_resource_directory")));
+
+    return conf;
+}
 
 int openrs_main(int argc, char** argv) {
 
-    CesIo::test();
+
+    ECManager::test();
     return 0;
 
 
@@ -56,8 +77,8 @@ int openrs_main(int argc, char** argv) {
     std::shared_ptr<CollisionCESystem> cces(new CollisionCESystem());
     systems.connectSystem(cces);
 
-    std::shared_ptr<GameGridCESystem> ggces(new GameGridCESystem());
-    systems.connectSystem(ggces);
+    //std::shared_ptr<GameGridCESystem> ggces(new GameGridCESystem());
+    //systems.connectSystem(ggces);
 
     // **************************
 

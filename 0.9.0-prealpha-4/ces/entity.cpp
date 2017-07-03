@@ -9,37 +9,16 @@
  * for the license.
  */
 
-#include <vector>
-#include <string>
-#include <map>
-
 #include "entity.h"
-#include "../fileio/cesio.h"
+#include "../utility.h"
 
-Entity::Entity()
+int Entity::generateUniqueEntityId()
 {
-
-}
-
-int Entity::numComponentsWithName(std::string name) {
-    if(component_nametable_.find(name) !=
-            component_nametable_.end()) {
-        return component_nametable_[name].getNumComponents();
+    static int i = 1;
+    i++;
+    if (i >= (1 << 30)) {
+        INFO_MSGOUT("Warning: Entity generateUniqueId() almost out."
+                    " Tell developer to fix UUID generator.");
     }
-    return 0;
-}
-
-ComponentList Entity::getComponentListWithName(std::string name) {
-    auto retval = component_nametable_.find(name);
-    return (retval == component_nametable_.end()) ? ComponentList() :
-                                                    (*retval).second;
-}
-
-int Entity::pushComponent(Component c) {
-    std::string name = c.getName();
-    auto clist_it = component_nametable_.find(name);
-    if (clist_it == component_nametable_.end()) {
-        component_nametable_[name] = ComponentList();
-    }
-    return component_nametable_[name].pushUniqueComponent(c);
+    return i;
 }

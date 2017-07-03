@@ -1,7 +1,47 @@
 - Finish CES:
-  - Load from files -> fill in EntityTypes -> make with EntityFactory
+  X Load from files
+  X Fill in EntityTypes
+  - Make with EntityFactory
   - Make it more convenient for systems to get components off of entities
-    - EntitySignature
-- Finish connecting up the dispatcher
+    - ECList basically
+  - Thread out the initial file loading
+- Get some files to start affecting the stuff on screen (player letter, etc.)
+- Working collision system
+- Finish connecting up the dispatcher / stripping movement code out of WinProc
 - Switch the grid out of AsciiDisplayCES, to gamegrid
+- Increment version to prealpha5-0
+
+Prealhpa 6:
+- Health system
+- Inventory system
+- Food system
+- Time system
+- Weapon system
+- Motionless enemies
+
+Prealpha 7:
+- Enemy AI (anything, random motion, move straight to player, anything)
+- Combat system
+- WinLose system
+
+Alpha 1:
+- Improved maps
+  - 1 to 3 handmade maps
+- Camera traversal / move with player, map larger than screen
+
+Alpha 1-1:
 - Start display system work
+  - Canvas object, drawing routines
+  - Need to have a design in mind really, see ORGANIZATION for discussion
+
+Alpha 1-2:
+- Map generator(s?)
+
+Alpha 1-3:
+- Better AI
+
+Alpha 1-4:
+- Unknown
+
+Alpha 2:
+- OpenGL working

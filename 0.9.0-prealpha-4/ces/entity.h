@@ -11,30 +11,34 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <vector>
 #include <string>
-#include <unordered_map>
 
-#include "../fileio/cesio.h"
-#include "componentlist.h"
+// Almost nothing but a unique number for an ID.
+
+typedef int entity_id_t;
 
 class Entity
 {
-    int id_;
-    std::unordered_map<std::string, ComponentList> component_nametable_;
+    entity_id_t id_;
+//    std::unordered_map<std::string, ComponentList> component_nametable_;
     std::string entity_type_name_; // e.g. "district", "player", "monster"
                                    // entity_type_name is only for readability;
                                    // any use in game logic is an error, as
                                    // logic should a.) be in a CESystem and
                                    // b.) rely on the components the entity has,
                                    // to determine what it is, not the name.
-    bool emit_event_on_update_;
+
     int generateUniqueEntityId();
 public:
-    Entity();
-    int numComponentsWithName(std::string name);
-    ComponentList getComponentListWithName(std::string name);
-    int pushComponent(Component c);
+    Entity(std::string entity_type_name = "") :
+        id_(generateUniqueEntityId()),  entity_type_name_(entity_type_name) {}
+
+    std::string getTypeName() { return entity_type_name_; }
+    void setTypeName(std::string type_name) {
+        entity_type_name_ = type_name;
+    }
+
+    entity_id_t getId() { return id_; }
 };
 
 #endif // ENTITY_H

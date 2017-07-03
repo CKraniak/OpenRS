@@ -19,12 +19,12 @@ BarebonesScript::BarebonesScript(std::string script_text)
 
 }
 
-int Component::generateUniqueId()
+component_id_t Component::generateUniqueId()
 {
     static int i = 1;
     i++;
     if (i >= (1 << 30)) {
-        INFO_MSGOUT("Warning: generateUniqueId() almost out."
+        INFO_MSGOUT("Warning: Component generateUniqueId() almost out."
                     " Tell developer to fix UUID generator.");
     }
     return i;

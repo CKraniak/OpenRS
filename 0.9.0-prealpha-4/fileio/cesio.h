@@ -11,10 +11,12 @@
 #ifndef CESIO_H
 #define CESIO_H
 
-#include <fstream>
-#include <vector>
+#include <memory>
 #include <string>
-#include <map>
+
+#include "directory.h"
+
+const std::string DEFAULT_ENTITY_FILE_EXTENSION(".orsce");
 
 // How will an entity come in?
 //
@@ -25,73 +27,26 @@
 // CesIo uses; that is, if there are two of the same label, the one appearing
 // first in the file will have a lower index than the other.
 
-struct CesIoToken {
-    typedef enum {
-        NONE = 0,
-        WORD,  // tokenizer type
-        NAME,  // parser type
-        VALUE, // parser type
-        WSP,
-        EQ,
-        EOF_,
-        ENDLINE
-    } TOKEN_TYPE;
-
-    TOKEN_TYPE type;
-    std::string value;
-    // pushChar() will push the char to the string if it can.
-    // It returns true if it both could and did push
-    // It returns false it it could not and did not push
-    bool pushChar(char c);
-    void clear() {
-        type = NONE;
-        value = "";
-    }
-
-private:
-    void updateType(char c);
-    bool canCharBeAppended(char c);
-    TOKEN_TYPE typeOfChar(char c);
-};
+class EntityFactory;
+class EntityType;
 
 class CesIo
 {
 public:
-    using CesFileMap  = std::map<std::string, std::vector<std::string>>;
-    const int NO_FILENAME_GIVEN = -1; // The filename hasn't been given
-    const int CANT_OPEN = -2; // The filename hasn't been given
-    const int MALFORMED_FILE = -3; // The file has bad syntax / something wonky
+    CesIo(std::string directory = "");
 
-    CesIo() : bytes_read_(NO_FILENAME_GIVEN), filename_("") {}
-    CesIo(std::string str) : filename_(str) {
-        bytes_read_ = loadFromFile(str);
-    }
+    void setDirectory(std::string dir) { directory_ = dir; }
+    std::string getDirectory() { return directory_; }
 
-    CesFileMap getStatements() {
-        return statements_;
-    }
-    // Returns number of bytes read.
-    int loadFromFile(std::string filename);
-    int getBytesRead() { return bytes_read_; }
-    std::string getFilename() { return filename_; }
+    // Returns number of EntityTypes added.
+    int populateEntityFactory(EntityFactory &factory);
+
     static void test();
 
 private:
-    std::string filename_;
-    std::vector<char> buffer_;
-    std::vector<CesIoToken> token_vec_;
-    CesFileMap statements_;
-    int bytes_read_;
+    std::string directory_;
 
-    using CesIoLine = std::pair<std::string, std::string>;
-    using CesFileLineVec = std::vector<CesIoLine>;
-    CesFileLineVec file_lines_;
-
-    void mergeLinesIntoStatementMap();
-    std::vector<CesIoToken> tokenize(std::vector<char> & buffer);
-    // interpret() and consolidate() can be thought of as two parts of a parser.
-    CesFileLineVec interpret(std::vector<CesIoToken> & token_vec);
-    CesFileMap consolidate(CesFileLineVec lines);
+    EntityType makeEntityTypeFromFile(std::string filename);
 };
 
 #endif // CESIO_H

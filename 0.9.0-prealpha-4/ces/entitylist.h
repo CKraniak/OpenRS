@@ -15,12 +15,22 @@
 #ifndef ENTITYLIST_H
 #define ENTITYLIST_H
 
+#include <map>
+#include <string>
 #include "entity.h"
 
 class EntityList
 {
-public:
+    friend class ECList;
+
+private:
     EntityList();
+
+    entity_id_t addNewEntity(std::string entity_type_name = "");
+    bool existsEntityWithId(entity_id_t);
+    bool deleteEntityWithId(entity_id_t);
+
+    std::map<entity_id_t, Entity> entity_map_;
 };
 
 #endif // ENTITYLIST_H

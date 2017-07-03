@@ -10,8 +10,4 @@
  */
 #include "componentlist.h"
 
-ComponentList::ComponentList()
-{
-
-}
 

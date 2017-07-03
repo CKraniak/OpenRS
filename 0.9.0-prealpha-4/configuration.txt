@@ -1,1 +1,9 @@
-display=ascii
+# Currently built to run WinGDI ASCII only. We will have non-ascii
+# display modes later on.
+#display=opengl_ascii
+#display=opengl_full
+#display=ascii
+display=wingdi_ascii
+
+# Location of core Entity files.
+core_resource_directory=/resources/data
