@@ -11,6 +11,8 @@
 
 #include "asciidisplaycesystem.h"
 
+#include "playermovementcesystem.h" // for DEFAULT_PLAYER_ASCIICHAR
+
 // So currently this system does the everything on its own.
 //
 // What I want in the long run is for the code to be arranged as follows:
@@ -40,6 +42,36 @@
 //      the AsciiRenderer
 //    - AsciiRenderer uses GraphicsDriver to write to screen (interfaces
 //      game render data to the driver's needs)
+
+// Another temporary, until I implement a proper drawing system backend.
+std::pair<int, int> AsciiDisplayCESystem::getPlayerPosition()
+{
+    auto p = ec_data_sys_->getEntitiesWithSignature(EntitySignature("is_player_type"))[0];
+    auto lxc =  ec_data_sys_->getComponent(p, "position_x");
+    auto lyc =  ec_data_sys_->getComponent(p, "position_y");
+    if ((! lxc.isValid()) || ! (lyc.isValid())) {
+        return std::pair<int, int>(-1, -1);
+    }
+    return std::pair<int, int>(lxc.getDataAsInt(), lyc.getDataAsInt());
+}
+
+char AsciiDisplayCESystem::getPlayerChar()
+{
+    auto p = ec_data_sys_->getEntitiesWithSignature(EntitySignature("is_player_type"))[0];
+    auto adc =  ec_data_sys_->getComponent(p, "ascii_display_char");
+    if (! adc.isValid()) {
+        return DEFAULT_PLAYER_ASCIICHAR;
+    }
+    return adc.getData()[0];
+}
+
+void AsciiDisplayCESystem::clearDirty()
+{
+    for (auto loc : dirty_locations_) {
+        this->setGridChar(DEFAULT_GROUND_ASCII_CHAR, loc.first, loc.second);
+    }
+}
+
 std::vector<char> AsciiDisplayCESystem::getRenderData()
 {
     std::vector<char> out;
@@ -68,10 +100,20 @@ GE_HND(test_esc_handler, int, "on_key_esc", {
            return 0;
        })
 
+using intpair = std::pair<int, int>;
+GE_HND(ascii_mark_dirty_handler, intpair, "ascii_mark_dirty_location", {
+           reinterpret_cast<AsciiDisplayCESystem*>(that)->markDirty(input);
+           return 0;
+       })
+
 GE_HND(retrieve_ascii_data_handler,
        std::shared_ptr<std::vector<char>>,
        "adces_retrieve_data_for_wndproc", {
            auto this_ = reinterpret_cast<AsciiDisplayCESystem*>(that);
+           auto pc_pos = this_->getPlayerPosition();
+           this_->clearDirty();
+           char pc = this_->getPlayerChar();
+           this_->setGridChar(pc, pc_pos.first, pc_pos.second);
            auto data = this_->getRenderData();
            for (auto c : data) {
                input->push_back(c);
@@ -107,6 +149,9 @@ void AsciiDisplayCESystem::onDispatcherAvailable()
     retrieve_ascii_data_handler.setThat(this);
     disp_->registerHandler<std::shared_ptr<std::vector<char>>>
             (retrieve_ascii_data_handler);
+    ascii_mark_dirty_handler.setThat(this);
+    disp_->registerHandler<intpair>
+            (ascii_mark_dirty_handler);
 }
 
 void AsciiDisplayCESystem::onAsciiCoreAvailable()

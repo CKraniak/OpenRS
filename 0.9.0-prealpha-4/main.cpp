@@ -79,8 +79,8 @@ int openrs_main(int argc, char** argv) {
     std::shared_ptr<CollisionCESystem> cces(new CollisionCESystem());
     systems.connectSystem(cces);
 
-    //std::shared_ptr<GameGridCESystem> ggces(new GameGridCESystem());
-    //systems.connectSystem(ggces);
+    std::shared_ptr<GameGridCESystem> ggces(new GameGridCESystem());
+    systems.connectSystem(ggces);
 
     // **************************
 

@@ -1,13 +1,13 @@
-- Finish CES:
+X Finish CES:
   X Load from files
   X Fill in EntityTypes
   X Make with EntityFactory
   X Make it more convenient for systems to get components off of entities
     - ECList basically
   N Thread out the initial file loading
-- Get some files to start affecting the stuff on screen (player letter, etc.)
+X Get some files to start affecting the stuff on screen (player letter, etc.)
 - Working collision system
-- Finish connecting up the dispatcher / stripping movement code out of WinProc
+X Finish connecting up the dispatcher / stripping movement code out of WinProc
 - Switch the grid out of AsciiDisplayCES, to gamegrid
 - Increment version to prealpha5-0
 

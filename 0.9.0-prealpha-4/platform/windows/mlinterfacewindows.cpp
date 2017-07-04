@@ -107,7 +107,7 @@ void MLInterfaceWindows::asciiDraw(HDC dc) {
     RECT r = {0, 0, 0, 0};
     clearWindow(back_dc, r);
     setFont(back_dc);
-    std::vector<char> new_text = adces.getRenderData();
+    //std::vector<char> new_text = adces.getRenderData();
 
     std::shared_ptr<std::vector<char>> new_text_ptr(new std::vector<char>);
     GameEvent<std::shared_ptr<std::vector<char>>>
@@ -116,7 +116,8 @@ void MLInterfaceWindows::asciiDraw(HDC dc) {
                            new_text_ptr);
     int retval = disp_->emitEvent(get_ascii_data);
 
-    std::string new_text_str(new_text.begin(), new_text.end());
+    //std::string new_text_str(new_text.begin(), new_text.end());
+    std::string new_text_str(new_text_ptr->begin(), new_text_ptr->end());
     display_text = new_text_str;
     DrawText(back_dc, display_text.c_str(), display_text.size(), &r, DT_NOCLIP);
     BitBlt(dc,
@@ -172,8 +173,8 @@ MLInterfaceWindows::MLInterfaceWindows(std::shared_ptr<StatefulDispatcher> disp)
         MLInterface(disp),
         display_text("INIT"),
         font(NULL),
-        adces(GAME_GRID_WIDTH, GAME_GRID_HEIGHT),
-        pmces(GAME_GRID_WIDTH / 2, GAME_GRID_HEIGHT / 2),
+//        adces(GAME_GRID_WIDTH, GAME_GRID_HEIGHT),
+//        pmces(GAME_GRID_WIDTH / 2, GAME_GRID_HEIGHT / 2),
         old_font(NULL){
     h_inst = win_h_inst;
     cmd_show_opt = win_cmd_show_opt;
@@ -204,7 +205,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         // key that isn't numpad 1-9.
         case VK_NUMPAD1:
         {
-            this_->pmces.onNumpad('1', this_->adces);
+            //this_->pmces.onNumpad('1', this_->adces);
             GameEvent<char> on_1("mlinterfacewindows_on_numpad_1", {"on_keypress_numpad", "on_keypress_numpad_1"}, 1);
             this_->disp_->emitEvent(on_1);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -212,7 +213,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD2:
         {
-            this_->pmces.onNumpad('2', this_->adces);
+            //this_->pmces.onNumpad('2', this_->adces);
             GameEvent<char> on_2("mlinterfacewindows_on_numpad_2", {"on_keypress_numpad", "on_keypress_numpad_2"}, 2);
             this_->disp_->emitEvent(on_2);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -220,7 +221,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD3:
         {
-            this_->pmces.onNumpad('3', this_->adces);
+            //this_->pmces.onNumpad('3', this_->adces);
             GameEvent<char> on_3("mlinterfacewindows_on_numpad_3", {"on_keypress_numpad", "on_keypress_numpad_3"}, 3);
             this_->disp_->emitEvent(on_3);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -228,7 +229,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD4:
         {
-            this_->pmces.onNumpad('4', this_->adces);
+            //this_->pmces.onNumpad('4', this_->adces);
             GameEvent<char> on_4("mlinterfacewindows_on_numpad_4", {"on_keypress_numpad", "on_keypress_numpad_4"}, 4);
             this_->disp_->emitEvent(on_4);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -236,7 +237,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD5:
         {
-            this_->pmces.onNumpad('5', this_->adces);
+            //this_->pmces.onNumpad('5', this_->adces);
             GameEvent<char> on_5("mlinterfacewindows_on_numpad_5", {"on_keypress_numpad", "on_keypress_numpad_5"}, 5);
             this_->disp_->emitEvent(on_5);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -244,7 +245,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD6:
         {
-            this_->pmces.onNumpad('6', this_->adces);
+            //this_->pmces.onNumpad('6', this_->adces);
             GameEvent<char> on_6("mlinterfacewindows_on_numpad_6", {"on_keypress_numpad", "on_keypress_numpad_6"}, 6);
             this_->disp_->emitEvent(on_6);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -252,7 +253,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD7:
         {
-            this_->pmces.onNumpad('7', this_->adces);
+            //this_->pmces.onNumpad('7', this_->adces);
             GameEvent<char> on_7("mlinterfacewindows_on_numpad_7", {"on_keypress_numpad", "on_keypress_numpad_7"}, 7);
             this_->disp_->emitEvent(on_7);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -260,7 +261,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD8:
         {
-            this_->pmces.onNumpad('8', this_->adces);
+            //this_->pmces.onNumpad('8', this_->adces);
             GameEvent<char> on_8("mlinterfacewindows_on_numpad_8", {"on_keypress_numpad", "on_keypress_numpad_8"}, 8);
             this_->disp_->emitEvent(on_8);
             InvalidateRect(h_wnd, NULL, TRUE);
@@ -268,7 +269,7 @@ LRESULT CALLBACK MLInterfaceWindows::MainWndProc(HWND h_wnd,
         }
         case VK_NUMPAD9:
         {
-            this_->pmces.onNumpad('9', this_->adces);
+            //this_->pmces.onNumpad('9', this_->adces);
             GameEvent<char> on_9("mlinterfacewindows_on_numpad_9", {"on_keypress_numpad", "on_keypress_numpad_9"}, 9);
             this_->disp_->emitEvent(on_9);
             InvalidateRect(h_wnd, NULL, TRUE);

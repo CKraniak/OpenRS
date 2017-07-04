@@ -72,7 +72,7 @@
 //  - MATCH: your handler's match string, as discussed else where. NOT bare, DO
 //           use quotation marks.
 //
-// The user
+// Reminder: parent should be the originating dispatcher.
 #define GE_HND(NAME, TYPE, MATCH, DEF)                                           \
 class hc_##NAME : public GameEventHandler<TYPE> {                              \
 public:                                                                   \

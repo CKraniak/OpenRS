@@ -14,25 +14,8 @@
 #include "gamegridcesystem.h"
 #include "../entity.h"
 
-std::pair<int, int> getLocationSingle(Entity e) {
-//    assert(e.numComponentsWithName("location_x") == 1);
-//    assert(e.numComponentsWithName("location_y") == 1);
-//    std::pair<int, int> retval;
-//    ComponentList xl = e.getComponentListWithName("location_x");
-//    retval.first = xl.getComponentByIndex(0)->getDataAsInt();
-//    ComponentList yl = e.getComponentListWithName("location_y");
-//    retval.second = yl.getComponentByIndex(0)->getDataAsInt();
-//    return retval;
-}
-
-void setLocationSingle(Entity e, int x, int y) {
-//    assert(e.numComponentsWithName("location_x") == 1);
-//    assert(e.numComponentsWithName("location_y") == 1);
-//    ComponentList xl = e.getComponentListWithName("location_x");
-//    xl.getComponentByIndex(0)->setData(std::to_string(x));
-//    ComponentList yl = e.getComponentListWithName("location_y");
-//    yl.getComponentByIndex(0)->setData(std::to_string(y));
-}
+#include <sstream>
+#include <string>
 
 struct TerrainTile {
     bool blocking_;
@@ -45,6 +28,9 @@ struct GameGrid {
     Entity player_;
     int width_;
     int height_;
+    std::shared_ptr<ECManager> ec_data_sys_;
+    bool linked;
+    EntitySignature player_sig;
 
     bool isOutOfBounds(int x, int y) {
         return (x < 0 || x >= width_ || y < 0 || y >= height_);
@@ -54,11 +40,36 @@ struct GameGrid {
         return (isOutOfBounds(x, y) || grid_[y * width_ + x].blocking_);
     }
 
+    // There is a decent chance these will crash the program if called before
+    // the player entity has actually been made.
+    std::pair<int, int> getLocationPlayer() {
+        auto e = (ec_data_sys_->getEntitiesWithSignature(player_sig))[0];
+        auto loc_x_c = ec_data_sys_->getComponent(e, "position_x");
+        auto loc_y_c = ec_data_sys_->getComponent(e, "position_y");
+        int loc_x = loc_x_c.getDataAsInt();
+        int loc_y = loc_y_c.getDataAsInt();
+        std::pair<int, int> retval(loc_x, loc_y);
+        return retval;
+    }
+
+    void setLocationPlayer(int x, int y) {
+        auto e = (ec_data_sys_->getEntitiesWithSignature(player_sig))[0];
+        auto loc_x_c = ec_data_sys_->getComponent(e, "position_x");
+        auto loc_y_c = ec_data_sys_->getComponent(e, "position_y");
+        std::stringstream ss;
+        ss << x;
+        ec_data_sys_->setComponentValue(loc_x_c, ss.str());
+        ss.str("");
+        ss <<  y;
+        ec_data_sys_->setComponentValue(loc_y_c, ss.str());
+        ss.str("");
+    }
+
     // This will eventually return a random int the caller will use as a
     // password when it moves the player.
     bool isTerrainTileBlockingPlayer(int dx, int dy) {
         int new_player_x, new_player_y;
-        std::pair<int, int> location = getLocationSingle(player_);
+        std::pair<int, int> location = getLocationPlayer();
         new_player_x = location.first + dx;
         new_player_y = location.second + dy;
         if (isBlockingTerrainTile(new_player_x, new_player_y))
@@ -68,13 +79,17 @@ struct GameGrid {
 
     void movePlayer(int dx, int dy) {
         int new_player_x, new_player_y;
-        std::pair<int, int> location = getLocationSingle(player_);
+        std::pair<int, int> location = getLocationPlayer();
         new_player_x = location.first + dx;
         new_player_y = location.second + dy;
-        setLocationSingle(player_, new_player_x, new_player_y);
+        setLocationPlayer(new_player_x, new_player_y);
     }
 
-    GameGrid(int width, int height): width_(width), height_(height) {
+    GameGrid(int width, int height):
+            width_(width),
+            height_(height),
+            linked(false),
+            player_sig("is_player_type") {
         TerrainTile tt;
         tt.blocking_ = false;
         tt.display_ = '.';
@@ -83,21 +98,31 @@ struct GameGrid {
             grid_.push_back(tt);
         }
     }
+
+    void linkEcManager(std::shared_ptr<ECManager> ec_data_sys) {
+        ec_data_sys_ = ec_data_sys;
+        linked = true;
+    }
 };
 
 using intpair = std::pair<int, int>;
 
 GE_HND(gamegrid_on_move_request, intpair, "on_player_request_move", {
     // Find terrain at target location, deny if colliding terrain or map edge
-    //if(this_->grid_->isBlockingTerrain())
     GameGridCESystem * this_ = reinterpret_cast<GameGridCESystem*>(that);
     int dx = input.first;
     int dy = input.second;
     if (this_->grid_->isTerrainTileBlockingPlayer(dx, dy)) {
-        INFO_MSGOUT("BLOCKED!");
+        //INFO_MSGOUT("BLOCKED!");
         return 0;
     }
+    auto last_loc = this_->grid_->getLocationPlayer();
     this_->grid_->movePlayer(dx, dy);
+    auto sd = reinterpret_cast<StatefulDispatcher*>(parent);
+    GameEvent<intpair> dirty("gamegrid_on_move_make_dirty",
+                                         {"ascii_mark_dirty_location"},
+                                         last_loc);
+    sd->emitEvent(dirty);
     return 0;
            // LATER:
     // Find entities at target location
@@ -120,17 +145,14 @@ GE_HND(gamegrid_on_update_viewport, std::string *, "on_update_viewport", {
 GameGridCESystem::GameGridCESystem()
 {
     grid_ = std::shared_ptr<GameGrid>(new GameGrid(15,15));
-
-    Component x("location_x", "7");
-    Component y("location_y", "7");
-
-//    grid_->player_.pushComponent(x);
-//    grid_->player_.pushComponent(y);
-    
-    grid_->isTerrainTileBlockingPlayer(1, 1);
 }
 
 void GameGridCESystem::onDispatcherAvailable() {
     gamegrid_on_move_request.setThat(this);
     disp_->registerHandler<intpair>(gamegrid_on_move_request);
+}
+
+void GameGridCESystem::onECManagerAvailable()
+{
+    grid_->linkEcManager(this->ec_data_sys_);
 }

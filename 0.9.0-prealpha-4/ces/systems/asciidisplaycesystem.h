@@ -42,12 +42,14 @@ class AsciiDisplayCESystem : public CESystem {
     // The following grid bits are being phased out / pushed into the
     // GameGridCESystem
     std::vector<char> grid_;
+    std::vector<std::pair<int, int>> dirty_locations_;
 	int width_;
 	int height_;
 
 	// updateGrid will iterate over the entities and push their chars to the
 	// locations specified. Any
 	void updateGrid(std::vector<Entity> & adces_entities);
+
 
 public:
     AsciiDisplayCESystem(int width = DEFAULT_GAMEGRID_WIDTH,
@@ -63,6 +65,14 @@ public:
     void onAsciiCoreAvailable();
     void onECManagerAvailable();
     void test_handler() { INFO_MSGOUT("Test in ADCES"); }
+
+    // These four are NOT meant to be public, don't use, kludge fix
+    std::pair<int, int> getPlayerPosition();
+    void markDirty(std::pair<int, int> loc) {
+        dirty_locations_.push_back(loc);
+    }
+    void clearDirty();
+    char getPlayerChar();
 };
 
 #endif // ASCIIDISPLAYCESYSTEM_H

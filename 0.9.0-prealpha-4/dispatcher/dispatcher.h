@@ -91,7 +91,9 @@ class Dispatcher
     // Well, the event already has data inside of it, so the void* isn't needed
     //
     // NEW DESIGN THING: make this a call stack, only use it to prevent
-    // infinite recursion.
+    // infinite recursion. SCRATCH THAT, if it ain't broke don't fix it, also
+    // trying to fix it is about 80% likely to break it due to some code needing
+    // to be able to have events inside of events.
     //std::queue<int> event_queue; // Event ID queue
 
     // The caller is either this or a substitute form of this. It's meant to

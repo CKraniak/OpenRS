@@ -23,8 +23,8 @@ class MLInterfaceWindows : public MLInterface {
     ENUMLOGFONTEXDV * ptr_elf;
     std::string display_text;
     HFONT font, old_font;
-    AsciiDisplayCESystem adces;
-    PlayerMovementCESystem pmces;
+//    AsciiDisplayCESystem adces;
+//    PlayerMovementCESystem pmces;
     HINSTANCE h_inst;
     int cmd_show_opt;
 

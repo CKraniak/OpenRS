@@ -22,13 +22,12 @@ struct GameGrid;
 
 class GameGridCESystem : public CESystem
 {
-    //Entity   movement_target_; // Current movement target; gets set by signals
-
 
 public:
     std::shared_ptr<GameGrid> grid_;
     GameGridCESystem();
     void onDispatcherAvailable();
+    void onECManagerAvailable();
 };
 
 #endif // GAMEGRIDCESYSTEM_H

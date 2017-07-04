@@ -37,18 +37,18 @@ GE_HND(on_numpad_playermovement, char,          "on_keypress_numpad "
                                    {"on_player_request_move"},
                                    dt);
     int response = sd->emitEvent(move_request);
-    if(response == 0) {
-        GameEvent<char> collision_event("playermovement_on_collide",
-                                        {"on_collide"},
-                                        input);
-        return sd->emitEvent(collision_event);
-    }
-    else {
-        GameEvent<char> move_command("playermovement_command_move",
-                                     {"on_command_move"},
-                                     response);
-        return sd->emitEvent(move_command);
-    }
+//    if(response == 0) {
+//        GameEvent<char> collision_event("playermovement_on_collide",
+//                                        {"on_collide"},
+//                                        input);
+//        return sd->emitEvent(collision_event);
+//    }
+//    else {
+//        GameEvent<char> move_command("playermovement_command_move",
+//                                     {"on_command_move"},
+//                                     response);
+//        return sd->emitEvent(move_command);
+//    }
 })
 
 void PlayerMovementCESystem::onDispatcherAvailable() {
@@ -57,6 +57,8 @@ void PlayerMovementCESystem::onDispatcherAvailable() {
 }
 
 void PlayerMovementCESystem::onECManagerAvailable() {
+    // This is actually not the correct way of doing things. This will
+    // eventually need to be part of a state change event handler.
     auto entity    = ec_data_sys_->makeEntity("player");
     auto component = ec_data_sys_->getComponent(entity, "ascii_display_char");
     if (component.isValid()) {
@@ -65,6 +67,11 @@ void PlayerMovementCESystem::onECManagerAvailable() {
             player_asciichar_ = data[0];
         }
     }
+    // Later on there will be a mapmaker to init this instead.
+    auto loc_x = ec_data_sys_->getComponent(entity, "position_x");
+    auto loc_y = ec_data_sys_->getComponent(entity, "position_y");
+    ec_data_sys_->setComponentValue(loc_x, "7");
+    ec_data_sys_->setComponentValue(loc_y, "7");
 }
 
 int PlayerMovementCESystem::onNumpad(char c, AsciiDisplayCESystem & s)
