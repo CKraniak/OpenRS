@@ -2,13 +2,15 @@
 # I do believe I'll use it for the EntityFactory / EntityType typename though.
 entity=player
 
-# Explicitly declare this a player type. If this is shown to be superfluous later, it can be fixed then.
+# Explicitly declare this a player type. If this is shown to be superfluous
+# later, it can be fixed then.
 is_player_type=true
 
 # Starting health.
 health=10
 
-# Maximum health attainable. This can change after the start of the game, based on whatever the associated
+# Maximum health attainable. This can change after the start of the game, based
+# on whatever the associated
 # system feels like doing.
 max_health=10
 
@@ -22,21 +24,26 @@ position_y=
 # Placeholder. Not really necessary for now.
 equipped_item=
 
-# I'm not completely sure how I will implement the inventory system yet, so this is just a placeholder.
+# I'm not completely sure how I will implement the inventory system yet, so this
+# is just a placeholder.
 inventory=
 
 # File name for the player sprite file.
 sprite_src=
 
-# Sides, for the combat system, NPC system, etc. to read and figure out how to proceed.
+# Sides, for the combat system, NPC system, etc. to read and figure out how to
+# proceed.
 alliance=human
 
-# A future info text system (say, if you hovered your mouse over the player) should show this text.
+# A future info text system (say, if you hovered your mouse over the player)
+# should show this text.
 # In this case, the system should execute 
 info_text=run_system(INFO, get_player_info, __MYID__)
 
-# The input system will look for the on_numpad component to determine who gets numpad input updates. We say that
-# we want numpad input events, and we want those to trigger the movement system's movePlayer function with the
-# special value __MYID__ (which resolves to the currrent entity's ID) as an argument. Essentially, it says: "on
-# numpad inputs, tell the movement system to move me."
+# The input system will look for the on_numpad component to determine who gets
+# numpad input updates. We say that we want numpad input events, and we want
+# those to trigger the movement system's movePlayer function with the
+# special value __MYID__ (which resolves to the currrent entity's ID) as an
+# argument. Essentially, it says: "on numpad inputs, tell the movement system
+# to move me."
 on_numpad=run_system(MOVEMENT, movePlayer, __MYID__)

@@ -12,6 +12,8 @@
 #ifndef ECMANAGER_H
 #define ECMANAGER_H
 
+#include <vector>
+
 #include "eclist.h"
 #include "entityfactory.h"
 
@@ -36,8 +38,33 @@ public:
     ECList        setEcList(ECList eclist);
 
     Entity makeEntity(std::string entity_typename);
+    bool   deleteEntity(Entity &e);
+
+    // Recall that there can be multiple components with the same name
+    std::vector<Component> getComponents(Entity e,
+                                         std::string component_name = "");
+    Component              getComponent(Entity e,
+                                        std::string component_name,
+                                        int index = 0);
+
+    // Using this is necessary to propogate the component value change into the
+    // ECList. You can't just change the component's value in your function and
+    // expect it to work, since you (should) only have a copy.
+    bool setComponentValue(Component &c, std::string new_value);
+    // This copies your changes to a component's value into the ECList, making
+    // the changes available to other systems.
+    bool pushComponentUpdate(Component c);
+
+    // You can kind of muddle around with Components, but entity generation
+    // is currently only something an EntityType can do.
+    bool addComponentToEntity(Entity e, Component c);
+    bool removeComponentFromEntity(Entity e, Component c);
+
+    std::vector<Entity> getEntitiesWithSignature(EntitySignature sig);
 
     static void test();
+
+    int loadDirectory(std::string directory);
 
 private:
     ECList eclist_;

@@ -23,6 +23,8 @@
 
 typedef int component_id_t;
 
+const component_id_t FIRST_COMPONENT_ID = 1;
+
 class ScriptedCESystem;
 
 class BarebonesScript {
@@ -64,13 +66,16 @@ class Component
     BarebonesScript script_;
 
     component_id_t generateUniqueId();
+
+    bool is_valid_;
 public:
-    Component() : script_(""), str_data_(), name_() {}
+    Component() : script_(""), str_data_(), name_(), is_valid_(false) {}
     Component(std::string name, std::string value) :
         name_(name),
         str_data_(value),
         script_(value),
-        id_(generateUniqueId())
+        id_(generateUniqueId()),
+        is_valid_(true)
          {}
     std::string getName() { return name_; }
     bool hasSameName(const Component & that);
@@ -88,6 +93,12 @@ public:
     BarebonesScript getDataAsScript() { return script_; }
 
     component_id_t getId() { return id_; }
+
+    static Component getInvalidComponent() {
+        return Component();
+    }
+
+    bool isValid() { return is_valid_; }
 };
 
 #endif // COMPONENT_H

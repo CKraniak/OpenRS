@@ -63,6 +63,9 @@ SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
 # Set our C++ version to C++11.
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+# Set optimizer. Want O3 for release.
+#SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+
 # Set linker flag -static, which I'm pretty sure tries to link in as many
 # static libraries as it can if given the choice. This is so the
 # "abcd.dll is missing" errors go away.

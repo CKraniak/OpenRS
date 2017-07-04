@@ -1,10 +1,10 @@
 - Finish CES:
   X Load from files
   X Fill in EntityTypes
-  - Make with EntityFactory
-  - Make it more convenient for systems to get components off of entities
+  X Make with EntityFactory
+  X Make it more convenient for systems to get components off of entities
     - ECList basically
-  - Thread out the initial file loading
+  N Thread out the initial file loading
 - Get some files to start affecting the stuff on screen (player letter, etc.)
 - Working collision system
 - Finish connecting up the dispatcher / stripping movement code out of WinProc

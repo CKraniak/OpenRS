@@ -17,6 +17,7 @@
 #include "cesystem.h"
 #include "../dispatcher/statefuldispatcher.h"
 #include "../graphics/asciicore.h"
+#include "ecmanager.h"
 
 // So how would systems be hooked in?
 
@@ -35,6 +36,7 @@ class SystemGroup
     std::vector<std::shared_ptr<CESystem>> systems_; // CESystems
     std::shared_ptr<StatefulDispatcher> disp_; // Event system
     std::shared_ptr<AsciiCore> ascii_core_; // Display system
+    std::shared_ptr<ECManager> ec_data_sys_;
 
 public:
     SystemGroup(std::shared_ptr<StatefulDispatcher> disp) :

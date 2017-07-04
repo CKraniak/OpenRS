@@ -14,7 +14,7 @@
 
 int Entity::generateUniqueEntityId()
 {
-    static int i = 1;
+    static int i = FIRST_ENTITY_ID;
     i++;
     if (i >= (1 << 30)) {
         INFO_MSGOUT("Warning: Entity generateUniqueId() almost out."

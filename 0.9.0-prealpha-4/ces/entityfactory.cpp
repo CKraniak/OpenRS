@@ -13,7 +13,7 @@
 
 #include  <cassert>
 
-Entity EntityFactory::makeEntity(ECList ec_list, std::string type)
+Entity EntityFactory::makeEntity(ECList & ec_list, std::string type)
 {
     assert(hasEntity(type));
     return type_map[type].makeEntity(ec_list);
@@ -30,5 +30,5 @@ bool EntityFactory::pushNewType(std::string typename_, EntityType type_)
 
 bool EntityFactory::hasEntity(std::string typename_)
 {
-
+    return type_map.find(typename_) != type_map.end();
 }

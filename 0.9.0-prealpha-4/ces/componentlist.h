@@ -31,26 +31,20 @@ class ComponentList
 private:
     ComponentList() {}
 
-    std::vector<int> id_list_;
-    std::unordered_map<int, Component>  component_id_map_;
+    std::vector<component_id_t> id_list_;
+    std::unordered_map<component_id_t, Component>  component_id_map_;
     int count_;
 
-    int getFirstUnusedId();
-
     // Currently does not check for existence
-    Component getComponentById(int id) {
-        return component_id_map_[id];
-    }
-    Component getComponentByIndex(int i) {
-        return component_id_map_[id_list_[i]];
-    }
-    int pushUniqueComponent(Component c) {
-        int component_id = c.getId();
-        if(component_id_map_.find(component_id) == component_id_map_.end()) {
-            component_id_map_[component_id] =  c;
-            id_list_.push_back(component_id);
-        }
-    }
+    Component getComponentById(component_id_t id);
+    Component getComponentByIndex(int i);
+    component_id_t pushUniqueIdComponent(Component c);
+
+    bool setComponentValue(component_id_t id, std::string new_value);
+
+    bool hasComponent(component_id_t c);
+
+    bool removeComponent(component_id_t c);
 
     int getNumComponents() { return component_id_map_.size(); }
 };

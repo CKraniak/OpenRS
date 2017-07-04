@@ -1,0 +1,10 @@
+# Reminder: the entity name SHALL NOT be used in game logic
+# I do believe I'll use it for the EntityFactory / EntityType typename though.
+entity=medkit
+
+# How much this entity heals for.
+health_given=5
+
+# Grid position.
+position_x=
+position_y=

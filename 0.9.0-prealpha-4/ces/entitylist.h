@@ -24,11 +24,13 @@ class EntityList
     friend class ECList;
 
 private:
-    EntityList();
+    EntityList() {}
 
     entity_id_t addNewEntity(std::string entity_type_name = "");
-    bool existsEntityWithId(entity_id_t);
-    bool deleteEntityWithId(entity_id_t);
+    entity_id_t addNewEntity(Entity e);
+    bool existsEntityWithId(entity_id_t e_id);
+    bool deleteEntityWithId(entity_id_t e_id);
+    Entity getEntity(entity_id_t e_id);
 
     std::map<entity_id_t, Entity> entity_map_;
 };

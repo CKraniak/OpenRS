@@ -12,19 +12,32 @@
 #ifndef ENTITYSIGNATURE_H
 #define ENTITYSIGNATURE_H
 
-#include "entity.h"
-#include "componentlist.h"
+#include <string>
+#include <map>
+
+#include "component.h"
 
 // Need to be able for a system to know if an entity matches an arbitrary
 // "signature". Do this by seeing what components it has.
 //
 
 class EntitySignature {
-    ComponentList list_;
+    std::map<std::string, int> list_;
 
 public:
-    EntitySignature(ComponentList & cl) : list_(cl) {}
-	bool entityMatchesSignature(Entity & e);
+    EntitySignature();
+    EntitySignature(std::string component_name);
+    EntitySignature(std::vector<std::string> component_names);
+
+    int  setComponentName(std::string name, int count = 1);
+    void unsetComponentName(std::string name);
+
+    // If strict, the count must match exactly. If not, then the vector must
+    // have at least as many of the component as expected.
+    //
+    // I.e. it's EQUAL TO vs. GREATER THAN OR EQUAL TO
+    bool matchesSignature(std::vector<Component> components,
+                          bool strict = true);
 };
 
 #endif // ENTITYSIGNATURE_H

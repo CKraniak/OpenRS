@@ -35,7 +35,7 @@ class EntityType {
     // name (by specifying multiple values). Empty components have "" values.
     std::map<std::string, std::vector<std::string>> components_;
 public:
-    Entity makeEntity(ECList ec_list);
+    Entity makeEntity(ECList &ec_list);
 
     EntityType() {}
     EntityType(std::string name,

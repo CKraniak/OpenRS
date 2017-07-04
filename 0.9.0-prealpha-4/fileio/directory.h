@@ -34,6 +34,9 @@
 #include <string>
 #include <memory>
 
+// This is such a beautiful macro tho
+#define CWD (Directory::getDirectory()->getCwd())
+
 class Directory
 {
 public:

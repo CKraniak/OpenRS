@@ -11,9 +11,54 @@
 
 #include "entitysignature.h"
 
-bool EntitySignature::entityMatchesSignature(Entity &e)
+EntitySignature::EntitySignature(std::string component_name)
 {
-    // Get a list of all the items the entity has.
-    // Get / have a list of all the component names in the ComponentList
-    // Compare the two lists
+    list_[component_name] = 1;
+}
+
+EntitySignature::EntitySignature(std::vector<std::string> component_names)
+{
+    for(auto name : component_names) {
+        if (list_.find(name) == list_.end()) {
+            list_[name] = 1;
+        }
+        else {
+            list_[name] += 1;
+        }
+    }
+}
+
+int EntitySignature::setComponentName(std::string name, int count)
+{
+    list_[name] = count;
+    return count;
+}
+
+void EntitySignature::unsetComponentName(std::string name)
+{
+    list_.erase(name);
+}
+
+bool EntitySignature::matchesSignature(std::vector<Component> components,
+                                       bool strict)
+{
+    std::map<std::string, int> track;
+    for(auto c : components) {
+        if (track.find(c.getName()) == track.end()) {
+            track[c.getName()] = 1;
+        }
+        else {
+            track[c.getName()] += 1;
+        }
+    }
+    for (auto li : list_) {
+        if (track.find(li.first) == track.end()) {
+            return false;
+        }
+        if (track[li.first] < li.second ||
+            (strict && (track[li.first] != li.second))) {
+            return false;
+        }
+    }
+    return true;
 }

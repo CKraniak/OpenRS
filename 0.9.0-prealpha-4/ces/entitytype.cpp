@@ -13,9 +13,26 @@
 
 #include  <cassert>
 
-Entity EntityType::makeEntity(ECList ec_list)
+// Making an entity involves mostly just adding the correct entity (+ name)
+// and components to the ECList and associating them.
+Entity EntityType::makeEntity(ECList & ec_list)
 {
     Entity ret_entity;
+    ret_entity.setTypeName(typename_);
+    ret_entity.is_valid_ = true;
+    auto e_id = ec_list.registerEntity(ret_entity);
+    for (auto components_with_name : components_)  {
+        for (auto component_value : components_with_name.second) {
+            // Skip the bit about making a component out of the entity type
+            if (! component_value.compare(typename_)) {
+                continue;
+            }
+            Component c(components_with_name.first, component_value);
+            auto c_id = ec_list.registerComponent(c);
+            ec_list.giveComponentToEntity(c_id, e_id);
+        }
+    }
+    return ret_entity;
 }
 
 int EntityType::addComponent(std::string component_name, std::string component_value)

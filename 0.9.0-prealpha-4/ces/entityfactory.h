@@ -23,10 +23,12 @@ class EntityFactory {
 	std::map<std::string, EntityType> type_map; // typename, entity_type pairs
 
 public:
-    Entity makeEntity(ECList ec_list, std::string type);
+    Entity makeEntity(ECList &ec_list, std::string type);
     bool pushNewType(std::string typename_, EntityType type_);
 	void removeType(std::string typename_);
     bool hasEntity(std::string typename_);
+
+    int getNumTypes() { return type_map.size(); }
 };
 
 #endif // ENTITYFACTORY_H

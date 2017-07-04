@@ -17,10 +17,14 @@
 
 typedef int entity_id_t;
 
+const entity_id_t FIRST_ENTITY_ID = 1;
+
 class Entity
 {
+    friend class ECManager;
+    friend class EntityType;
+
     entity_id_t id_;
-//    std::unordered_map<std::string, ComponentList> component_nametable_;
     std::string entity_type_name_; // e.g. "district", "player", "monster"
                                    // entity_type_name is only for readability;
                                    // any use in game logic is an error, as
@@ -28,10 +32,14 @@ class Entity
                                    // b.) rely on the components the entity has,
                                    // to determine what it is, not the name.
 
+    bool is_valid_; // Can only be set / unset by the ECManager.
+
     int generateUniqueEntityId();
 public:
     Entity(std::string entity_type_name = "") :
-        id_(generateUniqueEntityId()),  entity_type_name_(entity_type_name) {}
+        id_(generateUniqueEntityId()),
+        entity_type_name_(entity_type_name),
+        is_valid_(false) {}
 
     std::string getTypeName() { return entity_type_name_; }
     void setTypeName(std::string type_name) {
@@ -39,6 +47,7 @@ public:
     }
 
     entity_id_t getId() { return id_; }
+    bool        isValid() { return is_valid_; }
 };
 
 #endif // ENTITY_H
