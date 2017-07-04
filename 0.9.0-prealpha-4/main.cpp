@@ -31,25 +31,27 @@ Configuration setupConfig () {
 
     assert(conf.setConfiguration("exe_cwd", d->getCwd()));
     assert(conf.setConfiguration("full_core_resource_dir",
-                                    conf.get("exe_cwd") +
+                                    conf.get("exe_cwd") + "/" +
                                     conf.get("core_resource_directory")));
 
     return conf;
 }
 
 int openrs_main(int argc, char** argv) {
+    // Load and parse configuration.
+    auto config = setupConfig();
 
-
-    ECManager::test();
-    return 0;
-
-
-
-
-    // - Start event system. Since this is the big intra-communication device,
-    //   it will generally come first.
+    // Start event system. Since this is the big intra-communication device,
+    // it will generally come first.
     auto sd = std::shared_ptr<StatefulDispatcher>(new StatefulDispatcher());
-    SystemGroup systems(sd);
+
+    // Load the Entity Component backbone. This functions sort of like a
+    // database for the CESystems to use.
+    auto ec_data_sys = std::shared_ptr<ECManager>(new ECManager());
+    auto entity_dir = config.get("full_core_resource_dir");
+    ec_data_sys->loadDirectory(entity_dir);
+
+    SystemGroup systems(sd, ec_data_sys);
 
     // - TODO: Process command-line args and config file here
 

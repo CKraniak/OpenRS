@@ -39,8 +39,9 @@ class SystemGroup
     std::shared_ptr<ECManager> ec_data_sys_;
 
 public:
-    SystemGroup(std::shared_ptr<StatefulDispatcher> disp) :
-        disp_(disp) {}
+    SystemGroup(std::shared_ptr<StatefulDispatcher> disp,
+                std::shared_ptr<ECManager>          ec_data_sys) :
+        disp_(disp), ec_data_sys_(ec_data_sys) {}
     bool connectAsciiCore(std::shared_ptr<AsciiCore> ascii_core);
     bool connectSystem(std::shared_ptr<CESystem> system);
     // Initialize will cause SystemGroup to send an "init" event via the

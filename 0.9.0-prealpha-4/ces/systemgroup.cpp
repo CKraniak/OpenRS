@@ -12,6 +12,7 @@
 
 bool SystemGroup::connectSystem(std::shared_ptr<CESystem> system) {
     system->connectDispatcher(disp_);
+    system->connectECManager(ec_data_sys_);
     systems_.push_back(system);
     return true;
 }

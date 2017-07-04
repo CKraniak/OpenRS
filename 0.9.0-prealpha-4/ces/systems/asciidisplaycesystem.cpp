@@ -68,6 +68,17 @@ GE_HND(test_esc_handler, int, "on_key_esc", {
            return 0;
        })
 
+GE_HND(retrieve_ascii_data_handler,
+       std::shared_ptr<std::vector<char>>,
+       "adces_retrieve_data_for_wndproc", {
+           auto this_ = reinterpret_cast<AsciiDisplayCESystem*>(that);
+           auto data = this_->getRenderData();
+           for (auto c : data) {
+               input->push_back(c);
+           }
+           return 0;
+       })
+
 // WAKE ME UP INSIDE
 // RESCUE ME
 //
@@ -93,9 +104,17 @@ void AsciiDisplayCESystem::onDispatcherAvailable()
 //    test_esc_handler.setThat(this);
 //    disp_->registerHandler<int>(test_esc_handler);
     //    disp_->registerHandler<int>(hnd);
+    retrieve_ascii_data_handler.setThat(this);
+    disp_->registerHandler<std::shared_ptr<std::vector<char>>>
+            (retrieve_ascii_data_handler);
 }
 
 void AsciiDisplayCESystem::onAsciiCoreAvailable()
+{
+
+}
+
+void AsciiDisplayCESystem::onECManagerAvailable()
 {
 
 }

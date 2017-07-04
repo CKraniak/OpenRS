@@ -21,13 +21,10 @@
 #include "component.h"
 #include "entitysignature.h"
 #include "../dispatcher/statefuldispatcher.h"
+#include "ecmanager.h"
 
 class CESystem
 {
-    // List of entity objects cached for quick operation
-    // Avoids having to iterate over a giant list from somewhere, but would
-    // need to be kept current ... maybe with some events?
-    std::vector<Entity> entity_cache_;
     // Components an entity needs for the entitiy to be handled by this system
     // A system should be able to define multiple things it handles, e.g.
     // the input system can handle an "on_numkey" component OR an "on_esc"
@@ -40,22 +37,30 @@ class CESystem
     // Well, no. That's the whole point of subclassing this: to provide
     // the specific required functionality in the subclass.
 
-    static Entity active_entity_; // shared instance for all handlers to use?
-
 protected:
-    void pushNeededSignature(EntitySignature & sig) {
-        signatures_handled_.push_back(sig);
-    }
     // Dispatcher the entity gets events from
     std::shared_ptr<StatefulDispatcher> disp_;
+
+    // Entity-component manager. Handles most things related to entities or
+    // components. This is the go-to for entities and components the system
+    // needs
+    std::shared_ptr<ECManager> ec_data_sys_;
 
 public:
     CESystem();
     bool entityHasNeededComponents(Entity & e);
     virtual int run(std::vector<Entity> & entity_list) {}
     void connectDispatcher(std::shared_ptr<StatefulDispatcher>);
+    void connectECManager(std::shared_ptr<ECManager>);
+
+    // Systems use this function to register their handlers as soon as a
+    // dispatcher is available to them.
     virtual void onDispatcherAvailable() { return; }
     virtual void onAsciiCoreAvailable() { return; }
+
+    // This will be used to register EntitySignatures with the ECManager if or
+    // when that funcionality becomes available.
+    virtual void onECManagerAvailable() { return; }
 };
 
 // Subclasses of a ScriptedCESystem are meant to fill the script function map

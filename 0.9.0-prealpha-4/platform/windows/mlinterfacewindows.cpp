@@ -108,6 +108,14 @@ void MLInterfaceWindows::asciiDraw(HDC dc) {
     clearWindow(back_dc, r);
     setFont(back_dc);
     std::vector<char> new_text = adces.getRenderData();
+
+    std::shared_ptr<std::vector<char>> new_text_ptr(new std::vector<char>);
+    GameEvent<std::shared_ptr<std::vector<char>>>
+            get_ascii_data("request_display_data_ascii",
+                           {"adces_retrieve_data_for_wndproc"},
+                           new_text_ptr);
+    int retval = disp_->emitEvent(get_ascii_data);
+
     std::string new_text_str(new_text.begin(), new_text.end());
     display_text = new_text_str;
     DrawText(back_dc, display_text.c_str(), display_text.size(), &r, DT_NOCLIP);

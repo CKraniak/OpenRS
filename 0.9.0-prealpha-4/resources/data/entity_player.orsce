@@ -2,6 +2,9 @@
 # I do believe I'll use it for the EntityFactory / EntityType typename though.
 entity=player
 
+# What the player will display as in ASCII mode
+ascii_display_char=W
+
 # Explicitly declare this a player type. If this is shown to be superfluous
 # later, it can be fixed then.
 is_player_type=true

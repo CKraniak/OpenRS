@@ -17,20 +17,26 @@
 const int DEFAULT_START_X = 7;
 const int DEFAULT_START_Y = 7;
 
+const char DEFAULT_PLAYER_ASCIICHAR = 'P';
+
 // THE SYSTEM CONNECTION IS TEMPORARY, DO NOT RELY ON IT
 #include "asciidisplaycesystem.h"
 
 class PlayerMovementCESystem : public ScriptedCESystem {
-    int pos_x;
-    int pos_y;
+    int  pos_x;
+    int  pos_y;
+    char player_asciichar_;
 public:
     PlayerMovementCESystem(int x = DEFAULT_START_X,
-                           int y = DEFAULT_START_Y) :
+                           int y = DEFAULT_START_Y,
+                           char playerchar = DEFAULT_PLAYER_ASCIICHAR) :
         pos_x(x),
-        pos_y(y) {}
+        pos_y(y),
+        player_asciichar_(playerchar) {}
     int onNumpad(char , AsciiDisplayCESystem &); // Apply a transform to the
                          // player object
     void onDispatcherAvailable();
+    void onECManagerAvailable();
 };
 
 #endif // PLAYERMOVEMENTCESYSTEM_H

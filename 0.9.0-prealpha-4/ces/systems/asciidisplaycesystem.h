@@ -61,6 +61,7 @@ public:
 	bool setGridChar(char c, int x, int y);
     void onDispatcherAvailable();
     void onAsciiCoreAvailable();
+    void onECManagerAvailable();
     void test_handler() { INFO_MSGOUT("Test in ADCES"); }
 };
 

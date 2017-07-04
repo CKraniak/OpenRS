@@ -20,3 +20,9 @@ void CESystem::connectDispatcher(std::shared_ptr<StatefulDispatcher> disp)
     disp_ = disp;
     onDispatcherAvailable();
 }
+
+void CESystem::connectECManager(std::shared_ptr<ECManager> ec_data_sys)
+{
+    ec_data_sys_ = ec_data_sys;
+    onECManagerAvailable();
+}

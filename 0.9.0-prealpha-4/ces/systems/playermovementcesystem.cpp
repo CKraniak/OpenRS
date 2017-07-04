@@ -56,56 +56,67 @@ void PlayerMovementCESystem::onDispatcherAvailable() {
     disp_->registerHandler<char>(on_numpad_playermovement);
 }
 
+void PlayerMovementCESystem::onECManagerAvailable() {
+    auto entity    = ec_data_sys_->makeEntity("player");
+    auto component = ec_data_sys_->getComponent(entity, "ascii_display_char");
+    if (component.isValid()) {
+        auto data = component.getData();
+        if (data.size() > 0) {
+            player_asciichar_ = data[0];
+        }
+    }
+}
+
 int PlayerMovementCESystem::onNumpad(char c, AsciiDisplayCESystem & s)
 {
     switch(c) {
     case '1':
-        if (s.setGridChar('P', pos_x - 1, pos_y + 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x - 1, pos_y + 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x--;
             pos_y++;
         }
         break;
     case '2':
-        if (s.setGridChar('P', pos_x, pos_y + 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x, pos_y + 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_y++;
         }
         break;
     case '3':
-        if (s.setGridChar('P', pos_x + 1, pos_y + 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x + 1, pos_y + 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x++;
             pos_y++;
         }
         break;
     case '4':
-        if (s.setGridChar('P', pos_x - 1, pos_y)) {
+        if (s.setGridChar(player_asciichar_, pos_x - 1, pos_y)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x--;
         }
         break;
     case '6':
-        if (s.setGridChar('P', pos_x + 1, pos_y)) {
+        if (s.setGridChar(player_asciichar_, pos_x + 1, pos_y)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x++;
         }
         break;
     case '7':
-        if (s.setGridChar('P', pos_x - 1, pos_y - 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x - 1, pos_y - 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x--;
             pos_y--;
         }
         break;
     case '8':
-        if (s.setGridChar('P', pos_x, pos_y - 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x, pos_y - 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_y--;
         }
         break;
     case '9':
-        if (s.setGridChar('P', pos_x + 1, pos_y - 1)) {
+        if (s.setGridChar(player_asciichar_, pos_x + 1, pos_y - 1)) {
             s.setGridChar(DEFAULT_GROUND_ASCII_CHAR, pos_x, pos_y);
             pos_x++;
             pos_y--;
