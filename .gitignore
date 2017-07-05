@@ -78,3 +78,4 @@ build-*/*
 !build-*/openrs*.exe
 *build*/*
 !*build*/openrs*.exe
+!*build*/openrs*.zip
